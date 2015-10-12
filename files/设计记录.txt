@@ -1,0 +1,122 @@
+数据库：citadelsdb
+	表：GameUser
+		主键GameUser_ID   		顺序数字
+		邮箱GameUser_Mail 		CHAR(size)
+		昵称GameUser_Nickname 	CHAR(size)
+		真实姓名GameUser_Name	CHAR(size)
+		密码GameUser_Pwd		（MD5）CHAR(size)
+		经验GameUser_Exp		INT(size)
+
+		
+程序结构：
+	Server：
+		
+			
+		
+		
+		
+		
+		
+		
+		
+		
+数据类型：
+	CtoS:
+		0:infoData
+			0:signData  mail|nick|pwd|real
+			1:landData  mail|pwd
+		1:房间信息
+			0：创建房间
+			1：加入房间
+	StoC:
+		1：房间信息
+			0：房号座位号
+		9：提示信息
+			
+
+卡牌分析：
+	角色牌
+		1、刺客
+		2、小偷
+		3、魔术师
+		4、国王
+		5、主教
+		6、商人
+		7、建筑师
+		8、军阀
+	建筑牌
+		warlord
+			战场，3，3
+			堡垒，5，2
+			监狱，2，3
+			瞭望塔，1，3
+		noble
+			城堡，4，4
+			庄园，3，5
+			皇宫，5，3
+		religious
+			大教堂，5，2
+			教堂，2，3
+			修道院，3，3
+			神殿，1，3
+		commercial
+			海港，4，3
+			市场，2，4
+			酒馆，1，5
+			市政厅，5，2
+			贸易站，2，3
+			码头，3，3
+		magic	
+			城墙，6
+			大学，6
+			铁匠铺, 5
+			天文台, 5
+			魔法学校, 6
+			图书馆, 6
+			实验室, 5
+			鬼城", 2
+			要塞, 3
+			龙门, 6
+			墓地, 5
+			        
+					
+
+            			
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

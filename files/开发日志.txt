@@ -1,0 +1,20 @@
+#15.10.10
+服务器处理连接请求。
+处理登陆请求：如果Status为Online，返回错误信息，如果Status为Break，则注册新socket，更新Status为Online。
+登陆成功时lobbyPlayerList加入新的playerData并将其status置为Online。
+#15.12.12
+服务器处理：
+创建房间时：
+	得到一个可用的RoomNum，
+	找到LobbyPlayerList中的playerData将其RNum和SNum改为应该的数字，
+	创建RoomData，
+	将PlayerData加入到RoomData对应位置，
+	将dataCenter中加入创建的RoomData，
+	发送给用户创建成功，
+	群发粗略大厅信息。
+加入房间时：
+	得到房间号rNum，
+	将LobbyPlayerList中的对应的PlayerData的RNum和SNum改成对应值，
+	将PlayerData加入到对应的RoomData，
+	发送给用户加入成功，和房间号，座位号，
+	发送详细信息给特定的房间号的人。

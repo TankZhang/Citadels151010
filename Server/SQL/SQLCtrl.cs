@@ -95,7 +95,7 @@ namespace Server.SQL
             reader.Close();
             return playerData;
         }
-        //构造函数
+        //构造函数 
         public SQLCtrl()
         {
             SqlConnection = new MySqlConnection("server=localhost;User Id=GameServer;password=forever;Database=citadelsdb");
