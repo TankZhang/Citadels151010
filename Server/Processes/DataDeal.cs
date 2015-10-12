@@ -67,7 +67,7 @@ namespace Server.Processes
                         switch (player.Status)
                         {
                             case "Online": playerData.Status = "1|3|-1|您的账号已经在游戏了|"; return;
-                            case "Break": player.Socket = socket; player.Status = "Online"; return;
+                            case "Break": player.Socket = socket; player.Status = "Online";  return;
                         }
                     }
                 }
