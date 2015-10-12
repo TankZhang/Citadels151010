@@ -1,0 +1,25 @@
+﻿<Window x:Class="Client.View.ConnectV"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.View"
+        xmlns:viewModel="clr-namespace:Client.ViewModel"
+        mc:Ignorable="d"
+        Title="Client" Height="200" Width="300"
+        WindowStartupLocation="CenterScreen" 
+        IsEnabled="{Binding IsEnable,Mode=OneWay}"
+        IsEnabledChanged="Window_IsEnabledChanged">
+    <Window.DataContext>
+        <viewModel:ConnectVM></viewModel:ConnectVM>
+    </Window.DataContext>
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="网址：" Margin="3"/>
+            <TextBox Text="{Binding Ip.Ip}"  Margin="3"/>
+            <TextBlock Text="端口："  Margin="3"/>
+            <TextBox Text="{Binding Ip.Port}" Margin="3"/>
+            <Button Command="{Binding BtnConnectCmd}" CommandParameter="{Binding Ip}" Content="连接" Width="40" Height="20"/>
+        </StackPanel>
+    </Grid>
+</Window>

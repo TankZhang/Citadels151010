@@ -1,0 +1,30 @@
+﻿<Window x:Class="Client.View.LoginV"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.View"
+        xmlns:viewModel="clr-namespace:Client.ViewModel"
+        mc:Ignorable="d"
+        Title="登陆" Height="200" Width="300"
+        WindowStartupLocation="CenterScreen"
+        IsEnabled="{Binding IsEnable}"
+        IsEnabledChanged="Window_IsEnabledChanged"
+        Closing="Window_Closing">
+    <Window.DataContext>
+        <viewModel:LoginVM x:Name="loginVm"></viewModel:LoginVM>
+    </Window.DataContext>
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="邮箱：" Margin="1"/>
+            <TextBox Text="{Binding UserInfo.Mail,Mode=OneWayToSource}" Margin="1"/>
+            <TextBlock Text="密码：" Margin="1"/>
+            <PasswordBox x:Name="pwdBox" Margin="1" 
+                         local:PasswordBoxBindingHelper.IsPasswordBindingEnabled="True"
+                         local:PasswordBoxBindingHelper.BindedPassword="{Binding Path=UserInfo.Pwd,Mode=OneWayToSource}"
+                         PasswordChanged="pwdBox_PasswordChanged"/>
+            <Button Content="登陆" Command="{Binding BtnLoginCmd}" CommandParameter="{Binding UserInfo}" Margin="1"/>
+            <Button Content="注册" Command="{Binding BtnSignCmd}" CommandParameter="{Binding UserInfo.Mail}" Margin="1"/>
+        </StackPanel>
+    </Grid>
+</Window>
