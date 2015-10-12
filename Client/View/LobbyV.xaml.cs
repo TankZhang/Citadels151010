@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,8 +20,10 @@ namespace Client.View
     /// </summary>
     public partial class LobbyV : Window
     {
+        LobbyVM lobbyVM = new LobbyVM();
         public LobbyV()
         {
+            DataContext = lobbyVM;
             InitializeComponent();
         }
     }

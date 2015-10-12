@@ -7,6 +7,38 @@
         mc:Ignorable="d"
         Title="大厅" Height="300" Width="500">
     <Grid>
-        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <ListView Name="lvRoom" Grid.RowSpan="2" ItemsSource="{Binding RoomList,Mode=OneWay}"  >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="房间号" DisplayMemberBinding="{Binding RNum}" />
+                        <GridViewColumn Header="人数" DisplayMemberBinding="{Binding Num}" />
+                        <GridViewColumn Header="创建人" DisplayMemberBinding="{Binding Creater}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <ListView Name="lvPlayer" Grid.Column="1" ItemsSource="{Binding PlayerList,Mode=OneWay}"  >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="座位号" DisplayMemberBinding="{Binding SNum}" />
+                        <GridViewColumn Header="昵称" DisplayMemberBinding="{Binding Nick}" />
+                        <GridViewColumn Header="经验" DisplayMemberBinding="{Binding Exp}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <Button x:Name="btnJoin" Content="加入房间" Command="{Binding BtnJoinCmd}" IsEnabled="{Binding CanJoin}"/>
+                <Button x:Name="btnCreate" Content="创建房间" Command="{Binding BtnCreatCmd}" IsEnabled="{Binding CanCreat}" />
+                <Button x:Name="btnStart" Content="开始游戏" Command="{Binding BtnStartCmd}" IsEnabled="{Binding CanStart}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

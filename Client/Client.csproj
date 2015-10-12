@@ -54,10 +54,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Datas\LobbyPlayer.cs" />
+    <Compile Include="Model\Datas\LobbyRoom.cs" />
     <Compile Include="Model\Datas\UserInfo.cs" />
     <Compile Include="Model\Net\IPAddr.cs" />
     <Compile Include="Model\Net\NetCtrl.cs" />
     <Compile Include="ViewModel\ConnectVM.cs" />
+    <Compile Include="ViewModel\LobbyVM.cs" />
     <Compile Include="ViewModel\LoginVM.cs" />
     <Compile Include="ViewModel\NotificationObject.cs" />
     <Compile Include="ViewModel\SignVM.cs" />
