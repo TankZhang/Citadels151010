@@ -13,7 +13,7 @@ namespace Server.Datas
         public Dictionary<int, RoomData> RoomDataDic { get; set; }
         public DataCenter()
         {
-            RoomNum = 0;
+            RoomNum = 1;
             LobbyPlayerList = new List<PlayerData>();
             RoomDataDic = new Dictionary<int, RoomData>();
         }

@@ -235,7 +235,7 @@ namespace Client.ViewModel
         //处理lobby收到的信息
         private void DealReceive(string s)
         {
-            string[] strs = s.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] strs = s.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "2") { return; }
             switch (strs[1])
             {
@@ -324,7 +324,7 @@ namespace Client.ViewModel
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
             ThReceive.Start(App.NetCtrl.SocketClient);
-            App.NetCtrl.Send("2|3|1");
+            App.NetCtrl.Send("2|3|1|");
             BtnJoinCmd = new RelayCommand(new Action(Join));
             BtnCreatCmd = new RelayCommand(new Action(Creat));
             BtnStartCmd = new RelayCommand(new Action(Start));

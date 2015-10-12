@@ -41,10 +41,17 @@ namespace Server.Processes
                     if (playerData.Status.Contains("1|3|1|"))
                     { playerData.Status = "Online"; dataCenter.LobbyPlayerList.Add(playerData); }
                     break;
+                case "2":
+                    DealLobbyData(dataCenter,socket,strs);break;
 
             }
         }
+        #region 通用函数
 
+        #endregion
+
+
+        #region 处理信息信息(strs[0]="1")
         private static void SignDeal(DataCenter dataCenter, Socket socket, PlayerData playerData)
         {
             foreach (var item in dataCenter.LobbyPlayerList)
@@ -73,5 +80,89 @@ namespace Server.Processes
                 }
             }        
         }
+        #endregion
+
+        #region 处理大厅信息(strs[0]="2")
+        private static void DealLobbyData(DataCenter dataCenter, Socket socket, string[] strs)
+        {
+            switch(strs[1])
+            {
+                //处理创建信息
+                case "1":
+                    DealLobbyData1(dataCenter,socket,strs);
+                    break;
+                //处理加入信息
+                case "2":
+                    DealLobbyData2(dataCenter, socket, strs);
+                    break;
+            }
+        }
+        //处理大厅的加入房间信息
+        private static void DealLobbyData2(DataCenter dataCenter, Socket socket, string[] strs)
+        {
+            int rNum = int.Parse(strs[2]);
+            int index = dataCenter.LobbyPlayerList.FindIndex(i => i.Mail == strs[3]);
+            dataCenter.LobbyPlayerList[index].RNum = rNum;
+            dataCenter.LobbyPlayerList[index].SNum = dataCenter.RoomDataDic[rNum].PlayerDataList.Count + 1;
+            dataCenter.RoomDataDic[rNum].PlayerDataList.Add(dataCenter.LobbyPlayerList[index]);
+            NetCtrl.Send(socket,"2|2|1|"+rNum+"|"+dataCenter.RoomDataDic[rNum].PlayerDataList.Count+"|");
+            SendDetailLobbyData(dataCenter,rNum);
+        }
+
+        //处理大厅创建房间的信息
+        private static void DealLobbyData1(DataCenter dataCenter, Socket socket, string[] strs)
+        {
+            dataCenter.RoomNum = 1;
+            while(dataCenter.RoomDataDic.Keys.Contains(dataCenter.RoomNum))
+            { dataCenter.RoomNum++; }
+            int index = dataCenter.LobbyPlayerList.FindIndex(i => i.Mail == strs[2]);
+            RoomData rd = new RoomData();
+            dataCenter.LobbyPlayerList[index].IsKill = true;
+            dataCenter.LobbyPlayerList[index].RNum = dataCenter.RoomNum;
+            dataCenter.LobbyPlayerList[index].SNum = 1;
+            rd.PlayerDataList.Add(dataCenter.LobbyPlayerList[index]);
+            dataCenter.RoomDataDic.Add(dataCenter.RoomNum, rd);
+            NetCtrl.Send(socket, "2|1|1|" + dataCenter.RoomNum + "|" + "1|");
+            SendRoughLobbyData(dataCenter);
+        }
+
+        //给在大厅中的人发送粗略信息
+        private static void SendRoughLobbyData(DataCenter dataCenter)
+        {
+            string str = "2|3|1|";
+            foreach (var item in dataCenter.RoomDataDic)
+            {
+                str += item.Key;
+                str += "|";
+                str += item.Value.PlayerDataList.Count;
+                str += "|";
+                str += item.Value.PlayerDataList[0].Nick;
+                str += "|";
+            }
+            foreach (var item in dataCenter.LobbyPlayerList)
+            {
+                NetCtrl.Send(item.Socket, str);
+            }
+        }
+
+        //给在特定房间内的人发送详细信息
+        private static void SendDetailLobbyData(DataCenter dataCenter, int rNum)
+        {
+            string str = "2|3|2|"+rNum+"|";
+            foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
+            {
+                str += item.SNum;
+                str += "|";
+                str += item.Nick;
+                str += "|";
+                str += item.Exp;
+                str += "|";
+            }
+            foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
+            {
+                NetCtrl.Send(item.Socket, str);
+            }
+        }
+        #endregion
     }
 }
