@@ -115,6 +115,15 @@ namespace Client.ViewModel
 
             set
             {
+                try
+                {
+                    if (RoomList[value].Num < 4 & RoomNum == 0)
+                    {
+                        CanJoin = true;
+                    }
+                    else { CanJoin = false; }
+                }
+                catch { }
                 _index = value;
                 RaisePropertyChanged("Index");
             }
@@ -130,6 +139,10 @@ namespace Client.ViewModel
 
             set
             {
+                if(value!=0)
+                { CanCreat = false; }
+                else
+                { CanCreat = true;}
                 _roomNum = value;
                 RaisePropertyChanged("RoomNum");
             }
@@ -257,11 +270,11 @@ namespace Client.ViewModel
                         CanCreat = false;
                     }
                     break;
-                    //返回的房间内部信息
+                //返回的房间内部信息
                 case "3":
                     DealRoomData(strs);
                     break;
-                    //返回与开始游戏相关的数据
+                //返回与开始游戏相关的数据
                 case "4":
                     DealGameData(strs);
                     break;
@@ -272,23 +285,23 @@ namespace Client.ViewModel
         //处理游戏数据
         private void DealGameData(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
                 //可以开始游戏
                 case "2":
-                    CanStart = true;break;
+                    CanStart = true; break;
             }
         }
 
         //处理房间内部信息
         private void DealRoomData(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
                 //处理粗略信息
                 case "1":
                     RoomList = new ObservableCollection<LobbyRoom>();
-                    for (int i = 1; i < strs.Length/3; i++)
+                    for (int i = 1; i < strs.Length / 3; i++)
                     {
                         LobbyRoom lr = new LobbyRoom();
                         lr.RNum = int.Parse(strs[3 * i]);
@@ -300,11 +313,11 @@ namespace Client.ViewModel
                 //处理详细信息
                 case "2":
                     PlayerList = new ObservableCollection<LobbyPlayer>();
-                    for (int i = 0; i < (strs.Length-4)/3; i++)
+                    for (int i = 0; i < (strs.Length - 4) / 3; i++)
                     {
                         LobbyPlayer lp = new LobbyPlayer();
                         lp.SNum = int.Parse(strs[3 * i + 4]);
-                        lp.Nick = strs[3*i+5];
+                        lp.Nick = strs[3 * i + 5];
                         lp.Exp = int.Parse(strs[3 * i + 6]);
                         PlayerList.Add(lp);
                     }
@@ -316,7 +329,7 @@ namespace Client.ViewModel
         {
             del = new Del(DealReceivePre);
             RoomNum = 0;
-            CanJoin = true;
+            CanJoin = false;
             CanCreat = true;
             CanStart = false;
             RoomList = new ObservableCollection<LobbyRoom>();

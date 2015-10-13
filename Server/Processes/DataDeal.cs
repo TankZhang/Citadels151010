@@ -95,8 +95,34 @@ namespace Server.Processes
                 case "2":
                     DealLobbyData2(dataCenter, socket, strs);
                     break;
+                case "3":
+                    DealLobbyData3(dataCenter,socket,strs);
+                    break;
+
             }
         }
+        //处理信息请求的数据
+        private static void DealLobbyData3(DataCenter dataCenter, Socket socket, string[] strs)
+        {
+            switch(strs[2])
+            {
+                //请求粗略信息
+                case "1":
+                    string str = "2|3|1|";
+                    foreach (var item in dataCenter.RoomDataDic)
+                    {
+                        str += item.Key;
+                        str += "|";
+                        str += item.Value.PlayerDataList.Count;
+                        str += "|";
+                        str += item.Value.PlayerDataList[0].Nick;
+                        str += "|";
+                    }
+                    NetCtrl.Send(socket, str);
+                    break;
+            }
+        }
+
         //处理大厅的加入房间信息
         private static void DealLobbyData2(DataCenter dataCenter, Socket socket, string[] strs)
         {
@@ -106,6 +132,7 @@ namespace Server.Processes
             dataCenter.LobbyPlayerList[index].SNum = dataCenter.RoomDataDic[rNum].PlayerDataList.Count + 1;
             dataCenter.RoomDataDic[rNum].PlayerDataList.Add(dataCenter.LobbyPlayerList[index]);
             NetCtrl.Send(socket,"2|2|1|"+rNum+"|"+dataCenter.RoomDataDic[rNum].PlayerDataList.Count+"|");
+            NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[0].Socket, "2|4|2");
             SendDetailLobbyData(dataCenter,rNum);
         }
 
@@ -123,6 +150,7 @@ namespace Server.Processes
             rd.PlayerDataList.Add(dataCenter.LobbyPlayerList[index]);
             dataCenter.RoomDataDic.Add(dataCenter.RoomNum, rd);
             NetCtrl.Send(socket, "2|1|1|" + dataCenter.RoomNum + "|" + "1|");
+            SendDetailLobbyData(dataCenter, dataCenter.RoomNum);
             SendRoughLobbyData(dataCenter);
         }
 

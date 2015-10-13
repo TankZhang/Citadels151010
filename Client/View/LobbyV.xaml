@@ -17,7 +17,9 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ListView Name="lvRoom" Grid.RowSpan="2" ItemsSource="{Binding RoomList,Mode=OneWay}"  >
+            <ListView Name="lvRoom" Grid.RowSpan="2" 
+                      ItemsSource="{Binding RoomList,Mode=OneWay}" 
+                      SelectedIndex="{Binding Index,Mode=OneWayToSource}" >
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="房间号" DisplayMemberBinding="{Binding RNum}" />
