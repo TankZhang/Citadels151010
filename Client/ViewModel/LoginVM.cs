@@ -115,7 +115,8 @@ namespace Client.ViewModel
                     }
                     string str = Encoding.UTF8.GetString(buffer, 0, r);
                     Console.WriteLine("loginV收到了" + str);
-                    DealPre(str); return;
+                    DealPre(str);
+                    return;
 
                 }//try结束
                 catch (Exception ex)

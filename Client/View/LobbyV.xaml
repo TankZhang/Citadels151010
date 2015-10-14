@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:Client.View"
         mc:Ignorable="d"
         Title="大厅" Height="300" Width="500"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        IsEnabled="{Binding IsEnable}" 
+        IsEnabledChanged="Window_IsEnabledChanged"
+        Closing="Window_Closing"
+        >
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -25,6 +29,7 @@
                         <GridViewColumn Header="房间号" DisplayMemberBinding="{Binding RNum}" />
                         <GridViewColumn Header="人数" DisplayMemberBinding="{Binding Num}" />
                         <GridViewColumn Header="创建人" DisplayMemberBinding="{Binding Creater}" />
+                        <GridViewColumn Header="状态" DisplayMemberBinding="{Binding Status}" />
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -40,7 +45,7 @@
             <StackPanel Grid.Column="1" Grid.Row="1">
                 <Button x:Name="btnJoin" Content="加入房间" Command="{Binding BtnJoinCmd}" IsEnabled="{Binding CanJoin}"/>
                 <Button x:Name="btnCreate" Content="创建房间" Command="{Binding BtnCreatCmd}" IsEnabled="{Binding CanCreat}" />
-                <Button x:Name="btnStart" Content="开始游戏" Command="{Binding BtnStartCmd}" IsEnabled="{Binding CanStart}" />
+                <Button x:Name="btnStart" Content="开始游戏" Command="{Binding BtnStartCmd}" IsEnabled="{Binding CanStart}" />              
             </StackPanel>
         </Grid>
     </Grid>

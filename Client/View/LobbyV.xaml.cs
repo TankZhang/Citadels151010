@@ -26,5 +26,22 @@ namespace Client.View
             DataContext = lobbyVM;
             InitializeComponent();
         }
+
+        private void Window_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == false)
+            {
+                Close();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!IsEnabled)
+            {
+                GameV gameV = new GameV();
+                gameV.Show();
+            }
+        }
     }
 }

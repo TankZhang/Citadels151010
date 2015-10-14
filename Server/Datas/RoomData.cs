@@ -15,7 +15,7 @@ namespace Server.Datas
         public List<Building> TableB { set; get; }
         public List<Hero> TableH { set; get; }
         public Dictionary<int, int> Hero2PlayerDic { set; get; }
-
+        public string Status{set; get;}
         public RoomData()
         {
             CardRes cardRes = new CardRes();
@@ -25,6 +25,7 @@ namespace Server.Datas
             TableH = new List<Hero>();
             Hero2PlayerDic = new Dictionary<int, int>();
             PlayerDataList = new List<PlayerData>();
+            Status = "未开始";
         }
     }
 }

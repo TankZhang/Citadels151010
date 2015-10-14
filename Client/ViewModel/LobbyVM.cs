@@ -1,5 +1,6 @@
 ﻿using Client.Command;
 using Client.Model.Datas;
+using Client.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -117,7 +118,7 @@ namespace Client.ViewModel
             {
                 try
                 {
-                    if (RoomList[value].Num < 4 & RoomNum == 0)
+                    if (RoomList[value].Num < 4 & RoomNum == 0 & RoomList[value].Status == "未开始")
                     {
                         CanJoin = true;
                     }
@@ -139,10 +140,10 @@ namespace Client.ViewModel
 
             set
             {
-                if(value!=0)
+                if (value != 0)
                 { CanCreat = false; }
                 else
-                { CanCreat = true;}
+                { CanCreat = true; }
                 _roomNum = value;
                 RaisePropertyChanged("RoomNum");
             }
@@ -209,6 +210,7 @@ namespace Client.ViewModel
 
         public delegate void Del(string a);
         Del del;
+        
         public void ReceiveSocket(object obj)
         {
             Socket s = obj as Socket;
@@ -224,8 +226,14 @@ namespace Client.ViewModel
                     }
                     string str = Encoding.UTF8.GetString(buffer, 0, r);
                     //DealReceivePre(str);
-                    Application.Current.Dispatcher.Invoke(del, str);
                     Console.WriteLine("Lobby收到了：" + str);
+                    string[] strs = str.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (strs.Contains("2|4|1|"))
+                    {
+                        IsEnable = false;
+                        return;
+                    }
+                    Application.Current.Dispatcher.Invoke(del, str);
                 }//try结束
                 catch (Exception ex)
                 {
@@ -301,12 +309,13 @@ namespace Client.ViewModel
                 //处理粗略信息
                 case "1":
                     RoomList = new ObservableCollection<LobbyRoom>();
-                    for (int i = 1; i < strs.Length / 3; i++)
+                    for (int i = 0; i < (strs.Length - 3) / 4; i++)
                     {
                         LobbyRoom lr = new LobbyRoom();
-                        lr.RNum = int.Parse(strs[3 * i]);
-                        lr.Num = int.Parse(strs[3 * i + 1]);
-                        lr.Creater = strs[3 * i + 2];
+                        lr.RNum = int.Parse(strs[4 * i + 3]);
+                        lr.Num = int.Parse(strs[4 * i + 4]);
+                        lr.Creater = strs[4 * i + 5];
+                        lr.Status = strs[4 * i + 6];
                         RoomList.Add(lr);
                     }
                     break;
@@ -332,6 +341,7 @@ namespace Client.ViewModel
             CanJoin = false;
             CanCreat = true;
             CanStart = false;
+            IsEnable = true;
             RoomList = new ObservableCollection<LobbyRoom>();
             PlayerList = new ObservableCollection<LobbyPlayer>();
             ThReceive = new Thread(ReceiveSocket);
