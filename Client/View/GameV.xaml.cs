@@ -20,9 +20,11 @@ namespace Client.View
     /// </summary>
     public partial class GameV : Window
     {
-        GameVM gameVM = new GameVM();
-        public GameV()
+        GameVM gameVM;
+        public GameV(int num,int seatNum)
         {
+            gameVM = new GameVM(num);
+            gameVM.GamePlayerList[seatNum - 1].Exp = 1;
             DataContext = gameVM;
             InitializeComponent();
         }

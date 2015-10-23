@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Client.Model.Datas;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -13,8 +15,24 @@ namespace Client.ViewModel
     {
         Thread ThReceive;
 
+        ObservableCollection<GamePlayer> _gamePlayerList;
+        public ObservableCollection<GamePlayer> GamePlayerList
+        {
+            get
+            {
+                return _gamePlayerList;
+            }
+
+            set
+            {
+                _gamePlayerList = value;
+                RaisePropertyChanged("GamePlayerList");
+            }
+        }
+
         public delegate void Del(string a);
         Del del;
+
 
         public void ReceiveSocket(object obj)
         {
@@ -58,12 +76,18 @@ namespace Client.ViewModel
 
         }
         //构造函数
-        public GameVM()
+        public GameVM(int num)
         {
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
             ThReceive.Start(App.NetCtrl.SocketClient);
+            GamePlayerList = new ObservableCollection<GamePlayer>();
+            for (int i = 0; i < num; i++)
+            {
+                GamePlayer p = new GamePlayer(i + 1, "", 0, 0);
+                GamePlayerList.Add(p);
+            }
         }
     }
 }

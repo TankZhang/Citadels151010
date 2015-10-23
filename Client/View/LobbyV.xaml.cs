@@ -1,4 +1,5 @@
-﻿using Client.ViewModel;
+﻿using Client.Model.Datas;
+using Client.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace Client.View
         {
             if (!IsEnabled)
             {
-                GameV gameV = new GameV();
+                GameV gameV = new GameV(lobbyVM.PlayerList.Count,lobbyVM.SeatNum);
                 gameV.Show();
             }
         }

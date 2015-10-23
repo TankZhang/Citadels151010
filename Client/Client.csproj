@@ -62,6 +62,7 @@
     <Compile Include="Model\Cards\ReligiousBuilding.cs" />
     <Compile Include="Model\Cards\SpecialBuilding.cs" />
     <Compile Include="Model\Cards\TradeBuilding.cs" />
+    <Compile Include="Model\Datas\GamePlayer.cs" />
     <Compile Include="Model\Datas\LobbyPlayer.cs" />
     <Compile Include="Model\Datas\LobbyRoom.cs" />
     <Compile Include="Model\Datas\UserInfo.cs" />

@@ -120,15 +120,27 @@ namespace Server.Processes
             int rNum = int.Parse(strs[2]);
             dataCenter.RoomDataDic[rNum].Status = "已开始";
             SendRoughLobbyData(dataCenter);
-            SendToRoom(dataCenter, rNum, "2|4|1|");
             for (int i = 0; i < dataCenter.RoomDataDic[rNum].PlayerDataList.Count; i++)
             {
                 int index = dataCenter.LobbyPlayerList.FindIndex(s => s.RNum == rNum);
                 dataCenter.LobbyPlayerList.RemoveAt(index);
             }
+            InitGameData(dataCenter,rNum);
             SendToRoom(dataCenter, rNum, "2|4|1|");
         }
 
+        //初始化游戏数据，给玩家初始的牌和钱
+        private static void InitGameData(DataCenter dataCenter, int rNum)
+        {
+            foreach (PlayerData playerData in dataCenter.RoomDataDic[rNum].PlayerDataList)
+            {
+                playerData.Money = 2;
+                playerData.PocketB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                playerData.PocketB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+            }
+        }
 
         //处理信息请求的数据
         private static void DealLobbyData3(DataCenter dataCenter, Socket socket, string[] strs)

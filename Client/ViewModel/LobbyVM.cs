@@ -149,6 +149,20 @@ namespace Client.ViewModel
             }
         }
 
+        int _seatNum;
+        public int SeatNum
+        {
+            get
+            {
+                return _seatNum;
+            }
+
+            set
+            {
+                _seatNum = value;
+            }
+        }
+
         ICommand _btnJoinCmd;
         public ICommand BtnJoinCmd
         {
@@ -191,14 +205,17 @@ namespace Client.ViewModel
             }
         }
 
+
         public void Join()
         {
             App.NetCtrl.Send("2|2|" + RoomList[Index].RNum + "|" + App.UserInfo.Mail + "|");
+            SeatNum = RoomList[Index].Num + 1;
         }
 
         public void Creat()
         {
             App.NetCtrl.Send("2|1|" + App.UserInfo.Mail + "|");
+            SeatNum = 1;
         }
 
         public void Start()
@@ -338,6 +355,7 @@ namespace Client.ViewModel
         {
             del = new Del(DealReceivePre);
             RoomNum = 0;
+            SeatNum = 0;
             CanJoin = false;
             CanCreat = true;
             CanStart = false;
