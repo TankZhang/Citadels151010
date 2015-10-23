@@ -54,6 +54,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Cards\Building.cs" />
+    <Compile Include="Model\Cards\CardRes.cs" />
+    <Compile Include="Model\Cards\Hero.cs" />
+    <Compile Include="Model\Cards\MilitaryBuilding.cs" />
+    <Compile Include="Model\Cards\NobleBuilding.cs" />
+    <Compile Include="Model\Cards\ReligiousBuilding.cs" />
+    <Compile Include="Model\Cards\SpecialBuilding.cs" />
+    <Compile Include="Model\Cards\TradeBuilding.cs" />
     <Compile Include="Model\Datas\LobbyPlayer.cs" />
     <Compile Include="Model\Datas\LobbyRoom.cs" />
     <Compile Include="Model\Datas\UserInfo.cs" />
@@ -114,9 +122,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\Cards\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Page Include="View\ConnectV.xaml">
       <SubType>Designer</SubType>
@@ -138,6 +144,48 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Cards\hero_1_Assassin.png" />
+    <Resource Include="Res\Cards\hero_2_Thief.png" />
+    <Resource Include="Res\Cards\hero_3_Magician.png" />
+    <Resource Include="Res\Cards\hero_4_King.png" />
+    <Resource Include="Res\Cards\hero_5_Bishop.png" />
+    <Resource Include="Res\Cards\hero_6_Merchant.png" />
+    <Resource Include="Res\Cards\hero_7_Architect.png" />
+    <Resource Include="Res\Cards\hero_8_ Warlord.png" />
+    <Resource Include="Res\Cards\hero_Back.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Cards\building_Back.png" />
+    <Resource Include="Res\Cards\militaryBuilding_Battlefield.png" />
+    <Resource Include="Res\Cards\militaryBuilding_Fortress.png" />
+    <Resource Include="Res\Cards\militaryBuilding_Prison.png" />
+    <Resource Include="Res\Cards\militaryBuilding_Watchtower.png" />
+    <Resource Include="Res\Cards\nobleBuilding_Castle.png" />
+    <Resource Include="Res\Cards\nobleBuilding_Manor.png" />
+    <Resource Include="Res\Cards\nobleBuilding_Palace.png" />
+    <Resource Include="Res\Cards\religiousBuilding_Cathedral.png" />
+    <Resource Include="Res\Cards\religiousBuilding_Church.png" />
+    <Resource Include="Res\Cards\religiousBuilding_Monastery.png" />
+    <Resource Include="Res\Cards\religiousBuilding_Temple.png" />
+    <Resource Include="Res\Cards\specialBuilding_Cemetery.png" />
+    <Resource Include="Res\Cards\specialBuilding_DragonGate.png" />
+    <Resource Include="Res\Cards\specialBuilding_Fortress.png" />
+    <Resource Include="Res\Cards\specialBuilding_GhostTown.png" />
+    <Resource Include="Res\Cards\specialBuilding_Laboratory.png" />
+    <Resource Include="Res\Cards\specialBuilding_Library.png" />
+    <Resource Include="Res\Cards\specialBuilding_MagicSchool.png" />
+    <Resource Include="Res\Cards\specialBuilding_Observatory.png" />
+    <Resource Include="Res\Cards\specialBuilding_Smithy.png" />
+    <Resource Include="Res\Cards\specialBuilding_University.png" />
+    <Resource Include="Res\Cards\specialBuilding_Wall.png" />
+    <Resource Include="Res\Cards\tradeBuilding_Harbour.png" />
+    <Resource Include="Res\Cards\tradeBuilding_Market.png" />
+    <Resource Include="Res\Cards\tradeBuilding_Pub.png" />
+    <Resource Include="Res\Cards\tradeBuilding_Townhouse.png" />
+    <Resource Include="Res\Cards\tradeBuilding_TradingPost.png" />
+    <Resource Include="Res\Cards\tradeBuilding_Wharf.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
