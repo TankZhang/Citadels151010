@@ -74,6 +74,9 @@
     <Compile Include="ViewModel\LoginVM.cs" />
     <Compile Include="ViewModel\NotificationObject.cs" />
     <Compile Include="ViewModel\SignVM.cs" />
+    <Compile Include="View\CitadelUC.xaml.cs">
+      <DependentUpon>CitadelUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ConnectV.xaml.cs">
       <DependentUpon>ConnectV.xaml</DependentUpon>
     </Compile>
@@ -94,6 +97,9 @@
     <Compile Include="Command\RelayCommand.cs" />
     <Compile Include="View\SignV.xaml.cs">
       <DependentUpon>SignV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TestUC.xaml.cs">
+      <DependentUpon>TestUC.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -123,8 +129,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
+    <Page Include="View\CitadelUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ConnectV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -142,6 +151,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\SignV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TestUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -187,6 +200,9 @@
     <Resource Include="Res\Cards\tradeBuilding_Townhouse.png" />
     <Resource Include="Res\Cards\tradeBuilding_TradingPost.png" />
     <Resource Include="Res\Cards\tradeBuilding_Wharf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Pic\GameVBG.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

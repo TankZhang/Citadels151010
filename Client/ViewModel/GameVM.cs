@@ -1,4 +1,5 @@
-﻿using Client.Model.Datas;
+﻿using Client.Command;
+using Client.Model.Datas;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Client.ViewModel
 {
@@ -29,6 +31,7 @@ namespace Client.ViewModel
                 RaisePropertyChanged("GamePlayerList");
             }
         }
+
 
         public delegate void Del(string a);
         Del del;
@@ -75,9 +78,31 @@ namespace Client.ViewModel
         {
 
         }
+        #region 测试
+        //ICommand _test1Cmd;
+        //public ICommand Test1Cmd
+        //{
+        //    get
+        //    {
+        //        return _test1Cmd;
+        //    }
+
+        //    set
+        //    {
+        //        _test1Cmd = value;
+        //    }
+        //}
+        //public void Test1()
+        //{
+        //    GamePlayerList[2].Buildings.Add(new Model.Cards.Building(1,2,"dsa",Model.Cards.FunctionType.commercial, @"\Res\Cards\militaryBuilding_Prison.png","zhege"));
+        //}
+        #endregion
+
+
         //构造函数
         public GameVM(int num)
         {
+            //Test1Cmd = new RelayCommand(new Action(Test1));
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;

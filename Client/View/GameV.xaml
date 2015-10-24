@@ -5,7 +5,58 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client.View"
         mc:Ignorable="d"
-        Title="GameV" Height="300" Width="600">
+        Title="富饶之城" Height="720" Width="1280"
+        WindowStyle="None">
+    <Window.Background>
+        <ImageBrush ImageSource="/Res/Pic/GameVBG.jpg"/>
+    </Window.Background>
     <Grid>
+        <Grid ShowGridLines="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="720*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="160*"/>
+                <ColumnDefinition Width="200*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="160*"/>
+                <RowDefinition Height="370*"/>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="160*"/>
+            </Grid.RowDefinitions>
+            <!--我的地盘-->
+            <local:CitadelUC x:Name="myCitadel"
+                             Grid.Row="3"
+                             Grid.Column="2"/>
+            <!--右侧地盘-->
+            <local:CitadelUC x:Name="rightCitadel"
+                             Grid.Column="4"
+                             Grid.Row="0"
+                             Grid.RowSpan="4">
+                <local:CitadelUC.LayoutTransform>
+                    <RotateTransform Angle="270"/>
+                </local:CitadelUC.LayoutTransform>
+            </local:CitadelUC>
+            <!--上面地盘-->
+            <local:CitadelUC x:Name="upCitadel"
+                             Grid.Column="2"
+                             Grid.Row="0">
+                <local:CitadelUC.LayoutTransform>
+                    <RotateTransform Angle="180"/>
+                </local:CitadelUC.LayoutTransform>
+            </local:CitadelUC>
+            <!--左侧地盘-->
+            <local:CitadelUC x:Name="leftCitadel"
+                             Grid.Column="0"
+                             Grid.Row="0"
+                             Grid.RowSpan="4">
+                <local:CitadelUC.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </local:CitadelUC.LayoutTransform>
+            </local:CitadelUC>
+            <local:TestUC Grid.Column="5"/>
+        </Grid>
     </Grid>
 </Window>
