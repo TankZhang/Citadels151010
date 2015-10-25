@@ -18,6 +18,8 @@ namespace Client.ViewModel
     public class GameVM : NotificationObject
     {
         Thread ThReceive;
+        int SeatNum { get; set; }
+        public CardRes CardRes { get; set; }
         #region 各种列表ObservableCollection
         //玩家列表
         ObservableCollection<GamePlayer> _gamePlayerList;
@@ -95,6 +97,7 @@ namespace Client.ViewModel
             set
             {
                 _pocketBuildings = value;
+                IsBlacksmithExist = false;
                 RaisePropertyChanged("PocketBuildings");
             }
         }
@@ -199,29 +202,63 @@ namespace Client.ViewModel
         }
 
         //当前中央控件式哪一步在显示
-        public int Step { get; set; }
-
-        //每一步是否完成的bool表示
-        public bool[] IsStepFinished { get; set; }
-
-        #region 中间控件显示的提示
-        //中间部分显示的提示
-        public string[] SelectText { get; set; }
-        //中间的提示，用于绑定
-        string _centerText;
-        public string CenterText
+        int _step;
+        public int Step
         {
             get
             {
-                return _centerText;
+                return _step;
             }
 
             set
             {
-                _centerText = value;
-                RaisePropertyChanged("CenterText");
+                _step = value;
+                RaisePropertyChanged("Step");
             }
         }
+
+        //每一步是否完成的bool表示    
+        ObservableCollection<bool> _isStepFinished;
+        public ObservableCollection<bool> IsStepFinished
+        {
+            get
+            {
+                return _isStepFinished;
+            }
+
+            set
+            {
+                _isStepFinished = value;
+                RaisePropertyChanged("IsStepFinished");
+            }
+        }
+
+        #region 特殊建筑处理
+        //检查列表中有没有特定的建筑牌
+        public bool IsExist(ObservableCollection<Building> buildings,int id)
+        {
+            List<Building> Bs= buildings.ToList<Building>();
+           if(Bs.FindIndex(s=>s.Id==id)>-1)
+            { return true; }
+            else { return false; }
+        }
+
+        //铁匠铺可不可以用
+        bool _isBlacksmithExist;
+        public bool IsBlacksmithExist
+        {
+            get
+            {
+                return _isBlacksmithExist;
+            }
+
+            set
+            {
+                _isBlacksmithExist = value;
+                RaisePropertyChanged("IsBlacksmithExist");
+            }
+        }
+        
         #endregion
 
         #region 处理接收的部分
@@ -295,6 +332,8 @@ namespace Client.ViewModel
             IsCenterBuildingMultiVisable = false;
             if (IsStepFinished[Step]) { return; }
             IsStepFinished[Step] = true;
+            if (Step == 14) IsStepFinished[5] = true;
+            RaisePropertyChanged("IsStepFinished");
             IEnumerable a = (IEnumerable)o;
             foreach (var item in a)
             {
@@ -327,16 +366,18 @@ namespace Client.ViewModel
                 case 2:
                 case 3:
                 case 4:
+                    if (Index < 0) { return; }
                     if (IsStepFinished[Step]) { return; }
                     IsStepFinished[Step] = true;
-                    Console.WriteLine("您选择的角色为"+Index);
+                    Console.WriteLine("您选择的角色为" + CenterHeros[Index].Name);
                     CancelSelect();
                     break;
                 case 5:
                 case 6:
+                    if (Index < 0) { return; }
                     if (IsStepFinished[Step]) { return; }
                     IsStepFinished[Step] = true;
-                    Console.WriteLine("您选择的玩家为"+Index);
+                    Console.WriteLine("您选择的玩家为" + CenterPlayer[Index].Nick);
                     CancelSelect();
                     break;
                 case 7:
@@ -344,9 +385,11 @@ namespace Client.ViewModel
                 case 9:
                 case 10:
                 case 11:
+                    if (Index < 0) { return; }
                     if (IsStepFinished[Step]) { return; }
                     IsStepFinished[Step] = true;
-                    Console.WriteLine("您单选的建筑为" + Index);
+                    RaisePropertyChanged("IsStepFinished");
+                    Console.WriteLine("您单选的建筑为" + CenterBuildings[Index].Name);
                     CancelSelect();
                     break;
                 default: return;
@@ -378,15 +421,15 @@ namespace Client.ViewModel
                 case 3:
                 case 4: IsCenterHeroVisable = false; break;
                 case 5:
-                case 6:IsCenterPlayerVisable = false;break;
+                case 6: IsCenterPlayerVisable = false; break;
                 case 7:
                 case 8:
                 case 9:
                 case 10:
-                case 11: IsCenterBuildingVisable = false;break;
+                case 11: IsCenterBuildingVisable = false; break;
                 case 12:
-                case 13: IsCenterBuildingMultiVisable = false;break;
-                default:Console.WriteLine("中间点击取消时出现了意外的Step!!");break;
+                case 13: IsCenterBuildingMultiVisable = false; break;
+                default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
             Index = -1;
         }
@@ -394,8 +437,6 @@ namespace Client.ViewModel
         #endregion
 
         #region 控制台按下的Cmd
-        //显示手牌的flag
-
         //控制台显示手牌按下
         ICommand _showHandCardsCmd;
         public ICommand ShowHandCardsCmd
@@ -414,6 +455,203 @@ namespace Client.ViewModel
         public void ShowHandCards()
         {
             IsCenterBuildingPocketVisable = !IsCenterBuildingPocketVisable;
+        }
+
+        //控制台我要建设命令
+        ICommand _buildCmd;
+        public ICommand BuildCmd
+        {
+            get
+            {
+                return _buildCmd;
+            }
+
+            set
+            {
+                _buildCmd = value;
+            }
+        }
+        //我要建设函数
+        public void Build()
+        {
+            if (!IsStepFinished[8])
+            {
+                Step = 8;
+                CenterBuildings = PocketBuildings;
+                IsCenterBuildingVisable = true;
+            }
+            if (!IsStepFinished[12])
+            {
+                Step = 12;
+                CenterBuildings = PocketBuildings;
+                IsCenterBuildingMultiVisable = true;
+            }
+        }
+
+        //我要刺杀命令
+        ICommand _killCmd;
+        public ICommand KillCmd
+        {
+            get
+            {
+                return _killCmd;
+            }
+
+            set
+            {
+                _killCmd = value;
+            }
+        }
+        //我要刺杀函数
+        public void Kill()
+        {
+            Step = 3;
+            IsCenterHeroVisable = true;
+            CenterHeros = new ObservableCollection<Hero>();
+            CardRes.Heros.ForEach(x => CenterHeros.Add(x));
+            CenterHeros.RemoveAt(0);
+            CenterHeros.RemoveAt(0);
+        }
+
+        //我要偷取命令
+        ICommand _stoleCmd;
+        public ICommand StoleCmd
+        {
+            get
+            {
+                return _stoleCmd;
+            }
+
+            set
+            {
+                _stoleCmd = value;
+            }
+        }
+        //我要偷取函数
+        public void Stole()
+        {
+            Step = 4;
+            IsCenterHeroVisable = true;
+            CenterHeros = new ObservableCollection<Hero>();
+            CardRes.Heros.ForEach(x => CenterHeros.Add(x));
+            CenterHeros.RemoveAt(0);
+            CenterHeros.RemoveAt(0);
+            CenterHeros.RemoveAt(0);
+        }
+
+        //我要与玩家交换命令
+        ICommand _swapWithPlayerCmd;
+        public ICommand SwapWithPlayerCmd
+        {
+            get
+            {
+                return _swapWithPlayerCmd;
+            }
+
+            set
+            {
+                _swapWithPlayerCmd = value;
+            }
+        }
+        //我要与玩家交换函数
+        public void SwapWithPlayer()
+        {
+            Step = 5;
+            IsCenterPlayerVisable = true;
+            CenterPlayer = new ObservableCollection<GamePlayer>();
+            CenterPlayer = GamePlayerList;
+            CenterPlayer.RemoveAt(SeatNum - 1);
+        }
+
+        //我要与牌堆交换命令
+        ICommand _swapWithCardsCmd;
+        public ICommand SwapWithCardsCmd
+        {
+            get
+            {
+                return _swapWithCardsCmd;
+            }
+
+            set
+            {
+                _swapWithCardsCmd = value;
+            }
+        }
+        //与牌堆交换函数
+        public void SwapWithCards()
+        {
+            Step = 14;
+            IsCenterBuildingMultiVisable = true;
+            CenterBuildings = PocketBuildings;
+        }
+
+        //我要摧毁命令
+        ICommand _destroyCmd;
+        public ICommand DestroyCmd
+        {
+            get
+            {
+                return _destroyCmd;
+            }
+
+            set
+            {
+                _destroyCmd = value;
+            }
+        }
+        //我要摧毁操作
+        public void Destroy()
+        {
+            Step = 6;
+            IsCenterPlayerVisable = true;
+            CenterPlayer = new ObservableCollection<GamePlayer>();
+            CenterPlayer = GamePlayerList;
+            CenterPlayer.RemoveAt(SeatNum - 1);
+        }
+
+        //发动铁匠铺命令
+        ICommand _blacksmithCmd;
+        public ICommand BlacksmithCmd
+        {
+            get
+            {
+                return _blacksmithCmd;
+            }
+
+            set
+            {
+                _blacksmithCmd = value;
+            }
+        }
+
+        //发动铁匠铺函数
+        public void Blacksmith()
+        {
+            IsBlacksmithExist = false;
+            Console.WriteLine("你发动了铁匠铺");
+        }
+
+        //发动实验室命令
+        ICommand _laboratoryCmd;
+        public ICommand LaboratoryCmd
+        {
+            get
+            {
+                return _laboratoryCmd;
+            }
+
+            set
+            {
+                _laboratoryCmd = value;
+            }
+        }
+
+        //发动实验室函数
+        public void Laboratory()
+        {
+            CenterBuildings = PocketBuildings;
+            Step = 11;
+            IsCenterBuildingVisable = true;
         }
         #endregion
 
@@ -508,65 +746,46 @@ namespace Client.ViewModel
             }
         }
 
+
         public void Test1()
         {
-            Index = -1;
-            CenterText = SelectText[Step];
-            switch (Step)
-            {
-                case 1:
-                case 2:
-                case 3:
-                case 4: IsCenterHeroVisable = true; break;
-                case 5:
-                case 6: IsCenterPlayerVisable = true; break;
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11: IsCenterBuildingVisable = true; break;
-                case 12:
-                case 13: IsCenterBuildingMultiVisable = true; break;
-                default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
-            }
+            PocketBuildings.Add(CardRes.Buildings[61]);
+            IsStepFinished[11]= !IsExist(PocketBuildings, 61);
         }
 
         public void Test2()
         {
-            CancelSelect();
+            PocketBuildings.RemoveAt(PocketBuildings.Count - 1);
+            IsStepFinished[11] = !IsExist(PocketBuildings, 61);
         }
 
         public void Test3()
         {
-            Index = -1;
         }
         #endregion
 
 
         //构造函数
-        public GameVM(int num)
+        public GameVM(int num,int sNum)
         {
-            #region 测试
-            Test1Text = "测试按钮1";
-            Test2Text = "测试按钮2";
-            Test3Text = "测试按钮3";
-            Test1Cmd = new RelayCommand(new Action(Test1));
-            Test2Cmd = new RelayCommand(new Action(Test2));
-            Test3Cmd = new RelayCommand(new Action(Test3));
-            #endregion
-
+            SeatNum = sNum;
             SelectMultiCmd = new RelayCommand(new Action<object>(SelectMulti));
             CancelSelectCmd = new RelayCommand(new Action(CancelSelect));
             ShowHandCardsCmd = new RelayCommand(new Action(ShowHandCards));
             SelectCmd = new RelayCommand(new Action(Select));
-            SelectText = new string[] { "", "请选择你想要的角色：", "请选择你要盖下的角色：", "请选择你要刺杀的角色：",
-                "请选择你要偷的角色：" ,"请选择你要换牌的玩家：","请选择你要摧毁的玩家：","请选择你要选择的手牌：",
-                "请选择你要建设的手牌：","请选择你要摧毁的建筑：","请选择你要选择的手牌：","请选择你要丢弃的手牌：",
-                "请选择你要建筑的手牌（最多三张）：","请选择你要的手牌（最多两张）："};
-            //del = new Del(DealReceivePre);
-            //ThReceive = new Thread(ReceiveSocket);
+            BuildCmd = new RelayCommand(new Action(Build));
+            KillCmd = new RelayCommand(new Action(Kill));
+            StoleCmd = new RelayCommand(new Action(Stole));
+            SwapWithPlayerCmd = new RelayCommand(new Action(SwapWithPlayer));
+            SwapWithCardsCmd = new RelayCommand(new Action(SwapWithCards));
+            DestroyCmd = new RelayCommand(new Action(Destroy));
+            BlacksmithCmd = new RelayCommand(new Action(Blacksmith));
+            LaboratoryCmd = new RelayCommand(new Action(Laboratory));
+            del = new Del(DealReceivePre);
+            ThReceive = new Thread(ReceiveSocket);
             //ThReceive.IsBackground = true;
             //ThReceive.Start(App.NetCtrl.SocketClient);
+            CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
             CenterPlayer = new ObservableCollection<GamePlayer>();
@@ -583,10 +802,42 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
             Index = -1;
-            Step = 12;
-            IsStepFinished = new bool[] {true,false,false,false,false, false,
-                false, false, false, false, false, false, false, false};
-            CenterText = SelectText[Step];
+            Step = 8;
+            IsStepFinished =new ObservableCollection<bool>(new List<bool> { true,false,false,false,false, false,
+                false, false, false, false, false, true, true, false,false });
+
+            #region 测试
+            Test1Text = "测试按钮1";
+            Test2Text = "测试按钮2";
+            Test3Text = "测试按钮3";
+            Test1Cmd = new RelayCommand(new Action(Test1));
+            Test2Cmd = new RelayCommand(new Action(Test2));
+            Test3Cmd = new RelayCommand(new Action(Test3));
+            GamePlayerList[0].Nick = "1号玩家";
+            GamePlayerList[1].Nick = "2号玩家";
+            GamePlayerList[2].Nick = "3号玩家";
+            GamePlayerList[2].Buildings.Add(CardRes.Buildings[0]);
+            GamePlayerList[2].Buildings.Add(CardRes.Buildings[10]);
+            GamePlayerList[2].Buildings.Add(CardRes.Buildings[20]);
+            GamePlayerList[2].Roles.Add(CardRes.Heros[0]);
+            GamePlayerList[2].Roles.Add(CardRes.Heros[1]);
+            GamePlayerList[1].Buildings.Add(CardRes.Buildings[5]);
+            GamePlayerList[1].Buildings.Add(CardRes.Buildings[15]);
+            GamePlayerList[1].Buildings.Add(CardRes.Buildings[25]);
+            GamePlayerList[1].Roles.Add(CardRes.Heros[2]);
+            GamePlayerList[1].Roles.Add(CardRes.Heros[3]);
+            GamePlayerList[0].Buildings.Add(CardRes.Buildings[8]);
+            GamePlayerList[0].Buildings.Add(CardRes.Buildings[18]);
+            GamePlayerList[0].Buildings.Add(CardRes.Buildings[28]);
+            GamePlayerList[0].Roles.Add(CardRes.Heros[4]);
+            GamePlayerList[0].Roles.Add(CardRes.Heros[5]);
+            CenterHeros.Add(CardRes.Heros[6]);
+            CenterHeros.Add(CardRes.Heros[7]);
+            CenterBuildings.Add(CardRes.Buildings[2]);
+            CenterBuildings.Add(CardRes.Buildings[15]);
+            PocketBuildings.Add(CardRes.Buildings[2]);
+            PocketBuildings.Add(CardRes.Buildings[60]);
+            #endregion
         }
     }
 }

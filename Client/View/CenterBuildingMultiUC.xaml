@@ -14,6 +14,7 @@
                 <Image Source="{Binding Path=ImgPath}" ToolTip="{Binding Description}"/>
             </Grid>
         </DataTemplate>
+        <local:Index2TextHelper x:Key="textConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid>
@@ -22,7 +23,7 @@
                 <RowDefinition Height="240*"/>
                 <RowDefinition Height="30*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding CenterText}"
+            <TextBlock Text="{Binding Step,Converter={StaticResource textConverter}}"
                        FontSize="30"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"/>

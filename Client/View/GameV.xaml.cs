@@ -24,7 +24,7 @@ namespace Client.View
         GameVM gameVM;
         public GameV(int num, int seatNum)
         {
-            gameVM = new GameVM(num);
+            gameVM = new GameVM(num, seatNum);
             gameVM.GamePlayerList[seatNum - 1].Exp = 1;
             DataContext = gameVM;
             InitializeComponent();
@@ -32,38 +32,27 @@ namespace Client.View
         #region 测试
         public GameV()
         {
-            CardRes cardRes = new CardRes();
-            gameVM = new GameVM(3);
+            int num = 3;
+            int sNum = 2;
+            gameVM = new GameVM(num, sNum);
             InitializeComponent();
             DataContext = gameVM;
-            myCitadel.DataContext = gameVM.GamePlayerList[2];
-            leftCitadel.DataContext = gameVM.GamePlayerList[1];
-            rightCitadel.DataContext = gameVM.GamePlayerList[0];
-            gameVM.GamePlayerList[0].Nick = "1号玩家";
-            gameVM.GamePlayerList[1].Nick = "2号玩家";
-            gameVM.GamePlayerList[2].Nick = "3号玩家";
-            gameVM.CenterPlayer = gameVM.GamePlayerList;
-            gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[0]);
-            gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[10]);
-            gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[20]);
-            gameVM.GamePlayerList[2].Roles.Add(cardRes.Heros[0]);
-            gameVM.GamePlayerList[2].Roles.Add(cardRes.Heros[1]);
-            gameVM.GamePlayerList[1].Buildings.Add(cardRes.Buildings[5]);
-            gameVM.GamePlayerList[1].Buildings.Add(cardRes.Buildings[15]);
-            gameVM.GamePlayerList[1].Buildings.Add(cardRes.Buildings[25]);
-            gameVM.GamePlayerList[1].Roles.Add(cardRes.Heros[2]);
-            gameVM.GamePlayerList[1].Roles.Add(cardRes.Heros[3]);
-            gameVM.GamePlayerList[0].Buildings.Add(cardRes.Buildings[8]);
-            gameVM.GamePlayerList[0].Buildings.Add(cardRes.Buildings[18]);
-            gameVM.GamePlayerList[0].Buildings.Add(cardRes.Buildings[28]);
-            gameVM.GamePlayerList[0].Roles.Add(cardRes.Heros[4]);
-            gameVM.GamePlayerList[0].Roles.Add(cardRes.Heros[5]);
-            gameVM.CenterHeros.Add(cardRes.Heros[6]);
-            gameVM.CenterHeros.Add(cardRes.Heros[7]);
-            gameVM.CenterBuildings.Add(cardRes.Buildings[2]);
-            gameVM.CenterBuildings.Add(cardRes.Buildings[15]);
-            gameVM.PocketBuildings.Add(cardRes.Buildings[2]);
-            gameVM.PocketBuildings.Add(cardRes.Buildings[60]);
+            myCitadel.DataContext = gameVM.GamePlayerList[sNum - 1];
+            switch (num)
+            {
+                case 2:
+                    upCitadel.DataContext = gameVM.GamePlayerList[2 - sNum];
+                    break;
+                case 3:
+                    leftCitadel.DataContext = gameVM.GamePlayerList[sNum % 3];
+                    rightCitadel.DataContext = gameVM.GamePlayerList[(sNum + 1) % 3];
+                    break;
+                case 4:
+                    leftCitadel.DataContext = gameVM.GamePlayerList[sNum % 4];
+                    upCitadel.DataContext = gameVM.GamePlayerList[(sNum + 1) % 4];
+                    rightCitadel.DataContext = gameVM.GamePlayerList[(sNum + 2) % 4];
+                    break;
+            }
         }
         #endregion
     }

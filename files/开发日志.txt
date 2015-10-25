@@ -80,6 +80,9 @@ CenterBuildingPocketUC.xaml
 	设置SelectMultiCmd表示多选，多选之后判断对应的IsStepFinished，如果为true返回，否则打印出来名称。
 	设置SelectCmd表示单选，根据Step判断，如果为true返回，否则打印。
 	设置CancelSelectCmd，根据Step关闭中间区域的显示，并且将Index置为-1。
+	将IsStepFinished加上1位为14位，为魔术师选择自己的建筑换牌堆。
+	在控制台加入我要建筑，我要刺杀，我要偷取，我要与玩家换牌，我要与牌堆换牌，我要摧毁，发动铁匠铺，发动实验室。
+	并加上了相应的绑定结果。
 	
 	
 	

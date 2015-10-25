@@ -51,7 +51,8 @@
                 </ListView.ItemsPanel>
             </ListView>
             <!--玩家已经建筑的建筑牌-->
-            <ListView Height="150"
+            <ListView HorizontalAlignment="Center"
+                      Height="150"
                       Grid.Row="1"
                       Grid.Column="1"
                       BorderBrush="Transparent"

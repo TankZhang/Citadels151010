@@ -8,11 +8,54 @@
              d:DesignHeight="30" d:DesignWidth="720">
     <UserControl.Resources>
         <local:HandCardsbtnContentBindingHelper x:Key="bool2ContentConverter"/>
+        <local:CollapsedBindingHelper x:Key="bool2CollapsedConverter"/>
+        <local:BtnVisibleHelper x:Key="collapsedCOnverter"/>
+        <local:VisibleHelper x:Key="visibleConverter"/>
     </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
             <Button Content="{Binding IsCenterBuildingPocketVisable,Converter={StaticResource bool2ContentConverter}}"
                     Command="{Binding ShowHandCardsCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要建设"
+                    Visibility="{Binding IsStepFinished,Converter={StaticResource bool2CollapsedConverter}}"
+                    Command="{Binding BuildCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要刺杀"
+                    Visibility="{Binding IsStepFinished[3],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding KillCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要偷取"
+                    Visibility="{Binding IsStepFinished[4],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding StoleCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要与玩家换牌"
+                    Visibility="{Binding IsStepFinished[5],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding SwapWithPlayerCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要与牌堆换牌"
+                    Visibility="{Binding IsStepFinished[5],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding SwapWithCardsCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="我要摧毁"
+                    Visibility="{Binding IsStepFinished[6],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding DestroyCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
+            <Button Content="发动铁匠铺"
+                    Visibility="{Binding IsBlacksmithExist,Converter={StaticResource visibleConverter}}"
+                    Command="{Binding BlacksmithCmd}"
+                    Margin="3"
+                    Background="Transparent"/> 
+            <Button Content="发动实验室"
+                    Visibility="{Binding IsStepFinished[11],Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding LaboratoryCmd}"
                     Margin="3"
                     Background="Transparent"/>
         </StackPanel>

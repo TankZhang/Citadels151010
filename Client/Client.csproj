@@ -71,12 +71,11 @@
     <Compile Include="Model\Net\NetCtrl.cs" />
     <Compile Include="ViewModel\ConnectVM.cs" />
     <Compile Include="ViewModel\GameVM.cs" />
-    <Compile Include="ViewModel\HandCardsbtnContentBindingHelper.cs" />
+    <Compile Include="ViewModel\Helpers.cs" />
     <Compile Include="ViewModel\LobbyVM.cs" />
     <Compile Include="ViewModel\LoginVM.cs" />
     <Compile Include="ViewModel\NotificationObject.cs" />
     <Compile Include="ViewModel\SignVM.cs" />
-    <Compile Include="ViewModel\VisibilityBindingHelper.cs" />
     <Compile Include="View\CenterBuildingMultiUC.xaml.cs">
       <DependentUpon>CenterBuildingMultiUC.xaml</DependentUpon>
     </Compile>

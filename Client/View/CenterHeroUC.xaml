@@ -15,6 +15,7 @@
                 <Image Source="{Binding Path=ImgPath}" ToolTip="{Binding Description}"/>
             </Grid>
         </DataTemplate>
+        <local:Index2TextHelper x:Key="textConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid>
@@ -23,11 +24,12 @@
                 <RowDefinition Height="240*"/>
                 <RowDefinition Height="30*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding CenterText}"
+            <TextBlock Text="{Binding Step,Converter={StaticResource textConverter}}"
                        FontSize="30"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-            <ListView Height="240" 
+            <ListView x:Name="list"
+                      Height="240" 
                       Grid.Row="1" 
                       BorderBrush="Transparent"
                       Background="Transparent"
@@ -41,7 +43,7 @@
                       >
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding SelectCmd}"/>
+                        <i:InvokeCommandAction Command="{Binding SelectCmd}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <ListView.ItemsPanel>
