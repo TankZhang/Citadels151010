@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:local="clr-namespace:Client.View" 
              xmlns:datas="clr-namespace:Client.Model.Datas"
              mc:Ignorable="d" 
@@ -16,6 +17,15 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="240*"/>
+            <RowDefinition Height="30*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding CenterText}"
+                       FontSize="30"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
         <ListView Height="240" 
                       Grid.Row="1" 
                       BorderBrush="Transparent"
@@ -25,12 +35,31 @@
                       ScrollViewer.CanContentScroll="False"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                       ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                      HorizontalAlignment="Center">
+                      HorizontalAlignment="Center"
+                  SelectedIndex="{Binding Index,Mode=TwoWay}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SelectCmd}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
+        <!--下方按钮-->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="605*"/>
+                <ColumnDefinition Width="70*"/>
+                <ColumnDefinition Width="605*"/>
+            </Grid.ColumnDefinitions>
+            <Button Background="Transparent" 
+                        Grid.Column="1" 
+                        Margin="3" 
+                        Content="取消选择" 
+                        Command="{Binding CancelSelectCmd}"/>
+        </Grid>
     </Grid>
 </UserControl>

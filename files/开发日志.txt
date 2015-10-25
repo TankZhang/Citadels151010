@@ -74,7 +74,12 @@ CenterBuildingMultiUC.xaml
 CenterBuildingPocketUC.xaml
 	ItemsSource="{Binding PocketBuildings}"
 	Visibility="{Binding IsCenterBuildingPocketVisable, Converter={StaticResource visibilityConverter}}"
-
+#15.10.25
+	设置bool[] IsStepFinished标志位标志是否完成
+	设置SelectText = new string[] 表示中间的区域的提示显示
+	设置SelectMultiCmd表示多选，多选之后判断对应的IsStepFinished，如果为true返回，否则打印出来名称。
+	设置SelectCmd表示单选，根据Step判断，如果为true返回，否则打印。
+	设置CancelSelectCmd，根据Step关闭中间区域的显示，并且将Index置为-1。
 	
 	
 	

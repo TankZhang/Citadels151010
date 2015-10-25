@@ -201,11 +201,12 @@ namespace Client.ViewModel
         //当前中央控件式哪一步在显示
         public int Step { get; set; }
 
+        //每一步是否完成的bool表示
+        public bool[] IsStepFinished { get; set; }
+
         #region 中间控件显示的提示
-        //单选角色时显示的提示
-        public string[] SelectHeroText { get; set; }
-        //单选玩家显示的提示
-        public string[] SelectPlayerText { get; set; }
+        //中间部分显示的提示
+        public string[] SelectText { get; set; }
         //中间的提示，用于绑定
         string _centerText;
         public string CenterText
@@ -273,6 +274,7 @@ namespace Client.ViewModel
         #endregion
 
         #region 中间按键按下的Cmd
+
         //中间选按下确认选中键的命令
         ICommand _selectMultiCmd;
         public ICommand SelectMultiCmd
@@ -291,6 +293,8 @@ namespace Client.ViewModel
         public void SelectMulti(object o)
         {
             IsCenterBuildingMultiVisable = false;
+            if (IsStepFinished[Step]) { return; }
+            IsStepFinished[Step] = true;
             IEnumerable a = (IEnumerable)o;
             foreach (var item in a)
             {
@@ -299,6 +303,56 @@ namespace Client.ViewModel
                 Console.WriteLine("");
             }
         }
+
+        //中间list单选点击时的命令
+        ICommand _selectCmd;
+        public ICommand SelectCmd
+        {
+            get
+            {
+                return _selectCmd;
+            }
+
+            set
+            {
+                _selectCmd = value;
+            }
+        }
+        //中间list单选点击时的操作
+        public void Select()
+        {
+            switch (Step)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    if (IsStepFinished[Step]) { return; }
+                    IsStepFinished[Step] = true;
+                    Console.WriteLine("您选择的角色为"+Index);
+                    CancelSelect();
+                    break;
+                case 5:
+                case 6:
+                    if (IsStepFinished[Step]) { return; }
+                    IsStepFinished[Step] = true;
+                    Console.WriteLine("您选择的玩家为"+Index);
+                    CancelSelect();
+                    break;
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    if (IsStepFinished[Step]) { return; }
+                    IsStepFinished[Step] = true;
+                    Console.WriteLine("您单选的建筑为" + Index);
+                    CancelSelect();
+                    break;
+                default: return;
+            }
+        }
+
         //中间取消键按下的命令
         ICommand _cancelSelectCmd;
         public ICommand CancelSelectCmd
@@ -313,14 +367,30 @@ namespace Client.ViewModel
                 _cancelSelectCmd = value;
             }
         }
+
         //取消对应的操作
         public void CancelSelect()
         {
-            switch(Step)
+            switch (Step)
             {
-                default:IsCenterBuildingMultiVisable = false;break;
+                case 1:
+                case 2:
+                case 3:
+                case 4: IsCenterHeroVisable = false; break;
+                case 5:
+                case 6:IsCenterPlayerVisable = false;break;
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11: IsCenterBuildingVisable = false;break;
+                case 12:
+                case 13: IsCenterBuildingMultiVisable = false;break;
+                default:Console.WriteLine("中间点击取消时出现了意外的Step!!");break;
             }
+            Index = -1;
         }
+
         #endregion
 
         #region 控制台按下的Cmd
@@ -348,6 +418,8 @@ namespace Client.ViewModel
         #endregion
 
         #region 测试
+
+        #region 测试的Cmd
         ICommand _test1Cmd;
         public ICommand Test1Cmd
         {
@@ -419,6 +491,7 @@ namespace Client.ViewModel
                 _test3Cmd = value;
             }
         }
+        #endregion
 
         string _test3Text;
         public string Test3Text
@@ -435,20 +508,37 @@ namespace Client.ViewModel
             }
         }
 
-
         public void Test1()
         {
-            IsCenterBuildingPocketVisable = !IsCenterBuildingPocketVisable;
+            Index = -1;
+            CenterText = SelectText[Step];
+            switch (Step)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4: IsCenterHeroVisable = true; break;
+                case 5:
+                case 6: IsCenterPlayerVisable = true; break;
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11: IsCenterBuildingVisable = true; break;
+                case 12:
+                case 13: IsCenterBuildingMultiVisable = true; break;
+                default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
+            }
         }
 
         public void Test2()
         {
-            Index = -1;
+            CancelSelect();
         }
 
         public void Test3()
         {
-            IsCenterHeroVisable = !IsCenterHeroVisable;
+            Index = -1;
         }
         #endregion
 
@@ -468,8 +558,11 @@ namespace Client.ViewModel
             SelectMultiCmd = new RelayCommand(new Action<object>(SelectMulti));
             CancelSelectCmd = new RelayCommand(new Action(CancelSelect));
             ShowHandCardsCmd = new RelayCommand(new Action(ShowHandCards));
-            SelectHeroText = new string[] { "", "请选择你想要的角色：", "请选择你要盖下的角色：", "请选择你要刺杀的角色：", "请选择你要偷的角色：" };
-            SelectPlayerText = new string[] { "", "请选择换牌的玩家：", "请选择摧毁建筑的玩家：" };
+            SelectCmd = new RelayCommand(new Action(Select));
+            SelectText = new string[] { "", "请选择你想要的角色：", "请选择你要盖下的角色：", "请选择你要刺杀的角色：",
+                "请选择你要偷的角色：" ,"请选择你要换牌的玩家：","请选择你要摧毁的玩家：","请选择你要选择的手牌：",
+                "请选择你要建设的手牌：","请选择你要摧毁的建筑：","请选择你要选择的手牌：","请选择你要丢弃的手牌：",
+                "请选择你要建筑的手牌（最多三张）：","请选择你要的手牌（最多两张）："};
             //del = new Del(DealReceivePre);
             //ThReceive = new Thread(ReceiveSocket);
             //ThReceive.IsBackground = true;
@@ -490,8 +583,10 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
             Index = -1;
-            Step = -1;
-            CenterText = SelectHeroText[2];
+            Step = 12;
+            IsStepFinished = new bool[] {true,false,false,false,false, false,
+                false, false, false, false, false, false, false, false};
+            CenterText = SelectText[Step];
         }
     }
 }

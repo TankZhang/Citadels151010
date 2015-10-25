@@ -41,7 +41,7 @@
                       >
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding Test1Cmd}"/>
+                        <i:InvokeCommandAction Command="{Binding SelectCmd}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <ListView.ItemsPanel>
