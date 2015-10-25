@@ -11,8 +11,7 @@
         <DataTemplate x:Key="buildingDataTemplate"
                       DataType="{x:Type cards:Building}">
             <Grid Background="Transparent" Width="50" Height="150">
-                <Image Margin="0 0 -50 0" Source="{Binding Path=ImgPath}" ToolTip="{Binding Description}"/>
-                
+                <Image Margin="0 0 -50 0" Source="{Binding Path=ImgPath}" ToolTip="{Binding Description}"/>                
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="roleDataTemplate"

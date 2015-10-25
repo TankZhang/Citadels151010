@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -70,15 +71,35 @@
     <Compile Include="Model\Net\NetCtrl.cs" />
     <Compile Include="ViewModel\ConnectVM.cs" />
     <Compile Include="ViewModel\GameVM.cs" />
+    <Compile Include="ViewModel\HandCardsbtnContentBindingHelper.cs" />
     <Compile Include="ViewModel\LobbyVM.cs" />
     <Compile Include="ViewModel\LoginVM.cs" />
     <Compile Include="ViewModel\NotificationObject.cs" />
     <Compile Include="ViewModel\SignVM.cs" />
+    <Compile Include="ViewModel\VisibilityBindingHelper.cs" />
+    <Compile Include="View\CenterBuildingMultiUC.xaml.cs">
+      <DependentUpon>CenterBuildingMultiUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CenterBuildingPocketUC.xaml.cs">
+      <DependentUpon>CenterBuildingPocketUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CenterBuildingUC.xaml.cs">
+      <DependentUpon>CenterBuildingUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CenterHeroUC.xaml.cs">
+      <DependentUpon>CenterHeroUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CenterPlayerUC.xaml.cs">
+      <DependentUpon>CenterPlayerUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CitadelUC.xaml.cs">
       <DependentUpon>CitadelUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ConnectV.xaml.cs">
       <DependentUpon>ConnectV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ControlBoardUC.xaml.cs">
+      <DependentUpon>ControlBoardUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\GameV.xaml.cs">
       <DependentUpon>GameV.xaml</DependentUpon>
@@ -130,11 +151,35 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="View\CenterBuildingMultiUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterBuildingPocketUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterBuildingUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterHeroUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterPlayerUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CitadelUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ConnectV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ControlBoardUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

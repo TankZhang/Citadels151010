@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="Client.View.CenterPlayerUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Client.View" 
+             xmlns:datas="clr-namespace:Client.Model.Datas"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="1280">
+    <UserControl.Resources>
+        <DataTemplate x:Key="CPDataTemplate"
+                      DataType="datas:GamePlayer">
+            <Grid Background="White" Width="160" Height="240">
+                <TextBlock Text="{Binding Nick}" FontSize="80"></TextBlock>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <ListView Height="240" 
+                      Grid.Row="1" 
+                      BorderBrush="Transparent"
+                      Background="Transparent"
+                      ItemsSource="{Binding CenterPlayer}"
+                      ItemTemplate="{StaticResource CPDataTemplate}"
+                      ScrollViewer.CanContentScroll="False"
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                      HorizontalAlignment="Center">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+    </Grid>
+</UserControl>

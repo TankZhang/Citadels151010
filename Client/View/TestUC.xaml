@@ -8,7 +8,10 @@
              d:DesignHeight="160" d:DesignWidth="200">
     <Grid>
         <StackPanel>
-            <Button  Content="加上一张" />
+            <Button  Content="{Binding Test1Text}"  Command="{Binding Test1Cmd}"/>
+            <Button  Content="{Binding Test2Text}"  Command="{Binding Test2Cmd}"/>
+            <Button  Content="{Binding Test3Text}"  Command="{Binding Test3Cmd}"/>
+            <TextBlock Text="{Binding Index}"/>
         </StackPanel>
     </Grid>
 </UserControl>

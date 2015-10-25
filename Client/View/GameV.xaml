@@ -10,6 +10,9 @@
     <Window.Background>
         <ImageBrush ImageSource="/Res/Pic/GameVBG.jpg"/>
     </Window.Background>
+    <Window.Resources>
+        <local:VisibilityBindingHelper x:Key="visibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid ShowGridLines="True">
             <Grid.ColumnDefinitions>
@@ -56,7 +59,37 @@
                     <RotateTransform Angle="90"/>
                 </local:CitadelUC.LayoutTransform>
             </local:CitadelUC>
+            <!--测试区域-->
             <local:TestUC Grid.Column="5"/>
+            <!--中间大区-->
+            <Grid Grid.Row="1"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="6">
+                <!--中间角色显示-->
+                <local:CenterHeroUC 
+                    Visibility="{Binding IsCenterHeroVisable, Converter={StaticResource visibilityConverter}}"
+                    >
+                </local:CenterHeroUC>
+                <local:CenterPlayerUC 
+                    Visibility="{Binding IsCenterPlayerVisable, Converter={StaticResource visibilityConverter}}"
+                    >
+                </local:CenterPlayerUC>
+                <local:CenterBuildingUC 
+                    Visibility="{Binding IsCenterBuildingVisable, Converter={StaticResource visibilityConverter}}"
+                    >
+                </local:CenterBuildingUC>
+                <local:CenterBuildingMultiUC 
+                    Visibility="{Binding IsCenterBuildingMultiVisable, Converter={StaticResource visibilityConverter}}"
+                    >
+                </local:CenterBuildingMultiUC>
+                <local:CenterBuildingPocketUC 
+                    Visibility="{Binding IsCenterBuildingPocketVisable, Converter={StaticResource visibilityConverter}}"
+                    >
+                </local:CenterBuildingPocketUC>
+            </Grid>
+            <!--控制台-->
+            <local:ControlBoardUC Grid.Column="2" 
+                                  Grid.Row="2"/>
         </Grid>
     </Grid>
 </Window>

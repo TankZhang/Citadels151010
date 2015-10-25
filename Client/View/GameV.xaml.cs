@@ -39,6 +39,10 @@ namespace Client.View
             myCitadel.DataContext = gameVM.GamePlayerList[2];
             leftCitadel.DataContext = gameVM.GamePlayerList[1];
             rightCitadel.DataContext = gameVM.GamePlayerList[0];
+            gameVM.GamePlayerList[0].Nick = "1号玩家";
+            gameVM.GamePlayerList[1].Nick = "2号玩家";
+            gameVM.GamePlayerList[2].Nick = "3号玩家";
+            gameVM.CenterPlayer = gameVM.GamePlayerList;
             gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[0]);
             gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[10]);
             gameVM.GamePlayerList[2].Buildings.Add(cardRes.Buildings[20]);
@@ -54,6 +58,12 @@ namespace Client.View
             gameVM.GamePlayerList[0].Buildings.Add(cardRes.Buildings[28]);
             gameVM.GamePlayerList[0].Roles.Add(cardRes.Heros[4]);
             gameVM.GamePlayerList[0].Roles.Add(cardRes.Heros[5]);
+            gameVM.CenterHeros.Add(cardRes.Heros[6]);
+            gameVM.CenterHeros.Add(cardRes.Heros[7]);
+            gameVM.CenterBuildings.Add(cardRes.Buildings[2]);
+            gameVM.CenterBuildings.Add(cardRes.Buildings[15]);
+            gameVM.PocketBuildings.Add(cardRes.Buildings[2]);
+            gameVM.PocketBuildings.Add(cardRes.Buildings[60]);
         }
         #endregion
     }
