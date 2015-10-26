@@ -91,6 +91,9 @@
     <Compile Include="View\CenterPlayerUC.xaml.cs">
       <DependentUpon>CenterPlayerUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ChatUC.xaml.cs">
+      <DependentUpon>ChatUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CitadelUC.xaml.cs">
       <DependentUpon>CitadelUC.xaml</DependentUpon>
     </Compile>
@@ -167,6 +170,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CenterPlayerUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ChatUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -18,7 +18,8 @@ namespace Client.ViewModel
     public class GameVM : NotificationObject
     {
         Thread ThReceive;
-        int SeatNum { get; set; }
+        public int SeatNum { get; set; }
+        public int RoomNum { get; set; }
         public CardRes CardRes { get; set; }
         #region 各种列表ObservableCollection
         //玩家列表
@@ -233,12 +234,69 @@ namespace Client.ViewModel
             }
         }
 
+        #region 右侧聊天控制
+        //窗口中输入的text
+        string _chatText;
+        public string ChatText
+        {
+            get
+            {
+                return _chatText;
+            }
+
+            set
+            {
+                _chatText = value;
+                RaisePropertyChanged("ChatText");
+            }
+        }
+
+        //textlog绑定的
+        string _chatLog;
+        public string ChatLog
+        {
+            get
+            {
+                return _chatLog;
+            }
+
+            set
+            {
+                _chatLog = value;
+                RaisePropertyChanged("ChatLog");
+            }
+        }
+
+        //发送命令
+        ICommand _chatCmd;
+        public ICommand ChatCmd
+        {
+            get
+            {
+                return _chatCmd;
+            }
+
+            set
+            {
+                _chatCmd = value;
+            }
+        }
+
+        //发送操作
+        public void Chat()
+        {
+            Console.WriteLine(ChatText);
+            ChatLog += ("\n"+ChatText);
+            ChatText = "";
+        }
+        #endregion
+
         #region 特殊建筑处理
         //检查列表中有没有特定的建筑牌
-        public bool IsExist(ObservableCollection<Building> buildings,int id)
+        public bool IsExist(ObservableCollection<Building> buildings, int id)
         {
-            List<Building> Bs= buildings.ToList<Building>();
-           if(Bs.FindIndex(s=>s.Id==id)>-1)
+            List<Building> Bs = buildings.ToList<Building>();
+            if (Bs.FindIndex(s => s.Id == id) > -1)
             { return true; }
             else { return false; }
         }
@@ -258,7 +316,7 @@ namespace Client.ViewModel
                 RaisePropertyChanged("IsBlacksmithExist");
             }
         }
-        
+
         #endregion
 
         #region 处理接收的部分
@@ -559,7 +617,7 @@ namespace Client.ViewModel
             Step = 5;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
-            CenterPlayer = GamePlayerList;
+            GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
             CenterPlayer.RemoveAt(SeatNum - 1);
         }
 
@@ -605,7 +663,7 @@ namespace Client.ViewModel
             Step = 6;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
-            CenterPlayer = GamePlayerList;
+            GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
             CenterPlayer.RemoveAt(SeatNum - 1);
         }
 
@@ -749,14 +807,10 @@ namespace Client.ViewModel
 
         public void Test1()
         {
-            PocketBuildings.Add(CardRes.Buildings[61]);
-            IsStepFinished[11]= !IsExist(PocketBuildings, 61);
         }
 
         public void Test2()
         {
-            PocketBuildings.RemoveAt(PocketBuildings.Count - 1);
-            IsStepFinished[11] = !IsExist(PocketBuildings, 61);
         }
 
         public void Test3()
@@ -766,9 +820,10 @@ namespace Client.ViewModel
 
 
         //构造函数
-        public GameVM(int num,int sNum)
+        public GameVM(int num, int rNum, int sNum)
         {
             SeatNum = sNum;
+            RoomNum = rNum;
             SelectMultiCmd = new RelayCommand(new Action<object>(SelectMulti));
             CancelSelectCmd = new RelayCommand(new Action(CancelSelect));
             ShowHandCardsCmd = new RelayCommand(new Action(ShowHandCards));
@@ -781,6 +836,7 @@ namespace Client.ViewModel
             DestroyCmd = new RelayCommand(new Action(Destroy));
             BlacksmithCmd = new RelayCommand(new Action(Blacksmith));
             LaboratoryCmd = new RelayCommand(new Action(Laboratory));
+            ChatCmd = new RelayCommand(new Action(Chat));
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             //ThReceive.IsBackground = true;
@@ -801,10 +857,12 @@ namespace Client.ViewModel
             IsCenterHeroVisable = false;
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
+            ChatText = "";
+            ChatLog = "";
             Index = -1;
             Step = 8;
-            IsStepFinished =new ObservableCollection<bool>(new List<bool> { true,false,false,false,false, false,
-                false, false, false, false, false, true, true, false,false });
+            IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,false,false,false,false, false,
+                false, false, false, false, false, false, true, false,false });
 
             #region 测试
             Test1Text = "测试按钮1";

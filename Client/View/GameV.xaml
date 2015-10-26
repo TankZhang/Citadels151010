@@ -59,6 +59,9 @@
                     <RotateTransform Angle="90"/>
                 </local:CitadelUC.LayoutTransform>
             </local:CitadelUC>
+            <!--右侧聊天战报-->
+            <local:ChatUC Grid.Column="5"
+                          Grid.RowSpan="4"/>
             <!--测试区域-->
             <local:TestUC Grid.Column="5"/>
             <!--中间大区-->

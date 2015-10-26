@@ -22,19 +22,35 @@ namespace Client.View
     public partial class GameV : Window
     {
         GameVM gameVM;
-        public GameV(int num, int seatNum)
+        public GameV(int num,int roomNum, int seatNum)
         {
-            gameVM = new GameVM(num, seatNum);
-            gameVM.GamePlayerList[seatNum - 1].Exp = 1;
+            gameVM = new GameVM(num,roomNum, seatNum);
             DataContext = gameVM;
             InitializeComponent();
+            myCitadel.DataContext = gameVM.GamePlayerList[seatNum - 1];
+            switch (num)
+            {
+                case 2:
+                    upCitadel.DataContext = gameVM.GamePlayerList[2 - seatNum];
+                    break;
+                case 3:
+                    leftCitadel.DataContext = gameVM.GamePlayerList[seatNum % 3];
+                    rightCitadel.DataContext = gameVM.GamePlayerList[(seatNum + 1) % 3];
+                    break;
+                case 4:
+                    leftCitadel.DataContext = gameVM.GamePlayerList[seatNum % 4];
+                    upCitadel.DataContext = gameVM.GamePlayerList[(seatNum + 1) % 4];
+                    rightCitadel.DataContext = gameVM.GamePlayerList[(seatNum + 2) % 4];
+                    break;
+            }
         }
         #region 测试
         public GameV()
         {
             int num = 3;
             int sNum = 2;
-            gameVM = new GameVM(num, sNum);
+            int rNum = 3;
+            gameVM = new GameVM(num, rNum, sNum);
             InitializeComponent();
             DataContext = gameVM;
             myCitadel.DataContext = gameVM.GamePlayerList[sNum - 1];

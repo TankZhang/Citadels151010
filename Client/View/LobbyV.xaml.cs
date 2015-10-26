@@ -40,7 +40,7 @@ namespace Client.View
         {
             if (!IsEnabled)
             {
-                GameV gameV = new GameV(lobbyVM.PlayerList.Count,lobbyVM.SeatNum);
+                GameV gameV = new GameV(lobbyVM.PlayerList.Count,lobbyVM.RoomNum,lobbyVM.SeatNum);
                 gameV.Show();
             }
         }
