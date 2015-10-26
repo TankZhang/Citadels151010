@@ -68,6 +68,19 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
+            <StackPanel Grid.Column="2"
+                        Grid.Row="1"
+                        >
+                <TextBlock Text="{Binding Nick}"
+                           Foreground="White"
+                           FontSize="30"/>
+                <TextBlock Text="{Binding SeatNum}"
+                           Foreground="White"
+                           FontSize="30"/>
+                <TextBlock Text="{Binding Money}"
+                           Foreground="White"
+                           FontSize="30"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

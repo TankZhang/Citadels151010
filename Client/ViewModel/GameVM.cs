@@ -18,8 +18,8 @@ namespace Client.ViewModel
     public class GameVM : NotificationObject
     {
         Thread ThReceive;
-        public int SeatNum { get; set; }
-        public int RoomNum { get; set; }
+        public int SNum { get; set; }
+        public int RNum { get; set; }
         public CardRes CardRes { get; set; }
         #region 各种列表ObservableCollection
         //玩家列表
@@ -186,6 +186,7 @@ namespace Client.ViewModel
         }
         #endregion
 
+        #region 流程控制相关的Index，Step，IsStepFinished。
         //中间单选控件选中的index
         int _index;
         public int Index
@@ -233,6 +234,7 @@ namespace Client.ViewModel
                 RaisePropertyChanged("IsStepFinished");
             }
         }
+        #endregion
 
         #region 右侧聊天控制
         //窗口中输入的text
@@ -285,10 +287,28 @@ namespace Client.ViewModel
         //发送操作
         public void Chat()
         {
-            Console.WriteLine(ChatText);
-            ChatLog += ("\n"+ChatText);
+            if (ChatText == "") { return; }
+            Send("3|2|" + RNum + "|" + SNum + "|" + GamePlayerList[SNum - 1].Nick+"|"+ChatText+"|");
+            //ChatLog += (GamePlayerList[SNum - 1].Nick+":"+ChatText+"\n");
             ChatText = "";
         }
+
+        //窗口中显示的战报
+        string _battleLog;
+        public string BattleLog
+        {
+            get
+            {
+                return _battleLog;
+            }
+
+            set
+            {
+                _battleLog = value;
+                RaisePropertyChanged("BattleLog");
+            }
+        }
+
         #endregion
 
         #region 特殊建筑处理
@@ -319,7 +339,14 @@ namespace Client.ViewModel
 
         #endregion
 
-        #region 处理接收的部分
+        #region 处理发送接收的部分
+        //发送消息的函数
+        public void Send(string s)
+        {
+            BattleLog += ("\nC2S：" + s+"*");
+            App.NetCtrl.Send(s);
+        }
+
         //接收消息的委托
         public delegate void Del(string a);
         Del del;
@@ -364,8 +391,51 @@ namespace Client.ViewModel
         //处理game收到的信息
         private void DealReceive(string item)
         {
+            string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+            if (strs[0] != "3") { return; }
+            switch(strs[1])
+            {
+                //回复数据
+                case "1":DealData(strs);
+                    break;
+                //聊天数据
+                case "2":DealChat(strs);
+                    break;
 
+            }
         }
+
+        //处理聊天数据
+        private void DealChat(string[] strs)
+        {
+            if(int.Parse(strs[2])==SNum)
+            {
+                ChatLog += ("我：" + strs[3] + "\n");
+            }
+            else
+            {
+                ChatLog += (GamePlayerList[int.Parse(strs[2]) - 1].Nick + ":" + strs[3] + "\n");
+            }
+        }
+
+        //处理返回的数据
+        private void DealData(string[] strs)
+        {
+            switch(strs[2])
+            {
+                //此处为回复的是初始数据
+                case "1":
+                    PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[3])]);
+                    PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[4])]);
+                    GamePlayerList[SNum - 1].Money = int.Parse(strs[5]);
+                    for (int i = 6; i < strs.Length; i++)
+                    {
+                        GamePlayerList[i - 6].Nick = strs[i];
+                    }
+                    break;
+            }
+        }
+
         #endregion
 
         #region 中间按键按下的Cmd
@@ -618,7 +688,7 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
             GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
-            CenterPlayer.RemoveAt(SeatNum - 1);
+            CenterPlayer.RemoveAt(SNum - 1);
         }
 
         //我要与牌堆交换命令
@@ -664,7 +734,7 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
             GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
-            CenterPlayer.RemoveAt(SeatNum - 1);
+            CenterPlayer.RemoveAt(SNum - 1);
         }
 
         //发动铁匠铺命令
@@ -818,12 +888,12 @@ namespace Client.ViewModel
         }
         #endregion
 
-
+        
         //构造函数
         public GameVM(int num, int rNum, int sNum)
         {
-            SeatNum = sNum;
-            RoomNum = rNum;
+            SNum = sNum;
+            RNum = rNum;
             SelectMultiCmd = new RelayCommand(new Action<object>(SelectMulti));
             CancelSelectCmd = new RelayCommand(new Action(CancelSelect));
             ShowHandCardsCmd = new RelayCommand(new Action(ShowHandCards));
@@ -839,8 +909,8 @@ namespace Client.ViewModel
             ChatCmd = new RelayCommand(new Action(Chat));
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
-            //ThReceive.IsBackground = true;
-            //ThReceive.Start(App.NetCtrl.SocketClient);
+            ThReceive.IsBackground = true;
+            ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
@@ -859,10 +929,13 @@ namespace Client.ViewModel
             IsCenterBuildingPocketVisable = false;
             ChatText = "";
             ChatLog = "";
+            BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";
             Index = -1;
             Step = 8;
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,false,false,false,false, false,
                 false, false, false, false, false, false, true, false,false });
+
+            Send("3|1|1|"+RNum+"|"+SNum+"|");
 
             #region 测试
             Test1Text = "测试按钮1";
@@ -871,30 +944,31 @@ namespace Client.ViewModel
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
-            GamePlayerList[0].Nick = "1号玩家";
-            GamePlayerList[1].Nick = "2号玩家";
-            GamePlayerList[2].Nick = "3号玩家";
-            GamePlayerList[2].Buildings.Add(CardRes.Buildings[0]);
-            GamePlayerList[2].Buildings.Add(CardRes.Buildings[10]);
-            GamePlayerList[2].Buildings.Add(CardRes.Buildings[20]);
-            GamePlayerList[2].Roles.Add(CardRes.Heros[0]);
-            GamePlayerList[2].Roles.Add(CardRes.Heros[1]);
-            GamePlayerList[1].Buildings.Add(CardRes.Buildings[5]);
-            GamePlayerList[1].Buildings.Add(CardRes.Buildings[15]);
-            GamePlayerList[1].Buildings.Add(CardRes.Buildings[25]);
-            GamePlayerList[1].Roles.Add(CardRes.Heros[2]);
-            GamePlayerList[1].Roles.Add(CardRes.Heros[3]);
-            GamePlayerList[0].Buildings.Add(CardRes.Buildings[8]);
-            GamePlayerList[0].Buildings.Add(CardRes.Buildings[18]);
-            GamePlayerList[0].Buildings.Add(CardRes.Buildings[28]);
-            GamePlayerList[0].Roles.Add(CardRes.Heros[4]);
-            GamePlayerList[0].Roles.Add(CardRes.Heros[5]);
-            CenterHeros.Add(CardRes.Heros[6]);
-            CenterHeros.Add(CardRes.Heros[7]);
-            CenterBuildings.Add(CardRes.Buildings[2]);
-            CenterBuildings.Add(CardRes.Buildings[15]);
-            PocketBuildings.Add(CardRes.Buildings[2]);
-            PocketBuildings.Add(CardRes.Buildings[60]);
+            //GamePlayerList[0].Nick = "1号玩家";
+            //GamePlayerList[1].Nick = "2号玩家";
+            //GamePlayerList[1].Money = 5;
+            //GamePlayerList[2].Nick = "3号玩家";
+            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[0]);
+            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[10]);
+            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[20]);
+            //GamePlayerList[2].Roles.Add(CardRes.Heros[0]);
+            //GamePlayerList[2].Roles.Add(CardRes.Heros[1]);
+            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[5]);
+            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[15]);
+            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[25]);
+            //GamePlayerList[1].Roles.Add(CardRes.Heros[2]);
+            //GamePlayerList[1].Roles.Add(CardRes.Heros[3]);
+            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[8]);
+            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[18]);
+            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[28]);
+            //GamePlayerList[0].Roles.Add(CardRes.Heros[4]);
+            //GamePlayerList[0].Roles.Add(CardRes.Heros[5]);
+            //CenterHeros.Add(CardRes.Heros[6]);
+            //CenterHeros.Add(CardRes.Heros[7]);
+            //CenterBuildings.Add(CardRes.Buildings[2]);
+            //CenterBuildings.Add(CardRes.Buildings[15]);
+            //PocketBuildings.Add(CardRes.Buildings[2]);
+            //PocketBuildings.Add(CardRes.Buildings[60]);
             #endregion
         }
     }

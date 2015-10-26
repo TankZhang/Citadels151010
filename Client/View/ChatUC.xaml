@@ -12,12 +12,24 @@
             <RowDefinition Height="330*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <TextBox Grid.Row="1"
+        <TextBox x:Name="txtBattleLog" 
+                 Grid.Row="0"
+                 Text="{Binding BattleLog,Mode=OneWay}"
+                 VerticalScrollBarVisibility="Auto"
+                 Background="Transparent"
+                 Foreground="White"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"
+                 TextChanged="TextBox_TextChanged"/>
+        <TextBox x:Name="txtChatLog" 
+                 Grid.Row="1"
                  Text="{Binding ChatLog,Mode=OneWay}"
                  TextWrapping="WrapWithOverflow"
                  VerticalScrollBarVisibility="Auto"
                  Background="Transparent"
-                 Foreground="White"/>
+                 Foreground="White"
+                 IsReadOnly="True"
+                 TextChanged="TextBox_TextChanged"/>
         <!--最下面一列聊天窗口-->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -30,7 +42,8 @@
                      Foreground="White"
                      VerticalAlignment="Center"
                      FontSize="20"
-                     Text="{Binding ChatText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                     Text="{Binding ChatText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     TabIndex="0"/>
             <Button Content="发送"
                     Grid.Column="1"
                     Background="Transparent"
