@@ -98,7 +98,6 @@ namespace Client.ViewModel
             set
             {
                 _pocketBuildings = value;
-                IsBlacksmithExist = false;
                 RaisePropertyChanged("PocketBuildings");
             }
         }
@@ -560,9 +559,11 @@ namespace Client.ViewModel
                 case 10:
                 case 11: IsCenterBuildingVisable = false; break;
                 case 12:
-                case 13: IsCenterBuildingMultiVisable = false; break;
+                case 13:
+                case 14: IsCenterBuildingMultiVisable = false; break;
                 default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
+            IsCenterBuildingPocketVisable = false;
             Index = -1;
         }
 
@@ -586,6 +587,7 @@ namespace Client.ViewModel
         //控制台显示手牌的操作
         public void ShowHandCards()
         {
+            CancelSelect();
             IsCenterBuildingPocketVisable = !IsCenterBuildingPocketVisable;
         }
 
@@ -606,6 +608,7 @@ namespace Client.ViewModel
         //我要建设函数
         public void Build()
         {
+            CancelSelect();
             if (!IsStepFinished[8])
             {
                 Step = 8;
@@ -637,6 +640,7 @@ namespace Client.ViewModel
         //我要刺杀函数
         public void Kill()
         {
+            CancelSelect();
             Step = 3;
             IsCenterHeroVisable = true;
             CenterHeros = new ObservableCollection<Hero>();
@@ -662,6 +666,7 @@ namespace Client.ViewModel
         //我要偷取函数
         public void Stole()
         {
+            CancelSelect();
             Step = 4;
             IsCenterHeroVisable = true;
             CenterHeros = new ObservableCollection<Hero>();
@@ -688,6 +693,7 @@ namespace Client.ViewModel
         //我要与玩家交换函数
         public void SwapWithPlayer()
         {
+            CancelSelect();
             Step = 5;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
@@ -712,6 +718,7 @@ namespace Client.ViewModel
         //与牌堆交换函数
         public void SwapWithCards()
         {
+            CancelSelect();
             Step = 14;
             IsCenterBuildingMultiVisable = true;
             CenterBuildings = PocketBuildings;
@@ -734,6 +741,7 @@ namespace Client.ViewModel
         //我要摧毁操作
         public void Destroy()
         {
+            CancelSelect();
             Step = 6;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
@@ -781,6 +789,7 @@ namespace Client.ViewModel
         //发动实验室函数
         public void Laboratory()
         {
+            CancelSelect();
             CenterBuildings = PocketBuildings;
             Step = 11;
             IsCenterBuildingVisable = true;
@@ -964,6 +973,17 @@ namespace Client.ViewModel
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
+            GamePlayerList[0].Nick = "默认1";
+            GamePlayerList[1].Nick = "默认2";
+            GamePlayerList[2].Nick = "默认3";
+            GamePlayerList[0].Buildings.Add(CardRes.Buildings[12]);
+            GamePlayerList[0].Buildings.Add(CardRes.Buildings[14]);
+            GamePlayerList[1].Buildings.Add(CardRes.Buildings[17]);
+            GamePlayerList[1].Buildings.Add(CardRes.Buildings[19]);
+            GamePlayerList[2].Buildings.Add(CardRes.Buildings[24]);
+            GamePlayerList[2].Buildings.Add(CardRes.Buildings[29]);
+            PocketBuildings.Add(CardRes.Buildings[34]);
+            PocketBuildings.Add(CardRes.Buildings[39]);
             #endregion
         }
     }
