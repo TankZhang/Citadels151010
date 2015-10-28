@@ -98,6 +98,7 @@ namespace Client.ViewModel
             set
             {
                 _pocketBuildings = value;
+                IsBlacksmithExist = false;
                 RaisePropertyChanged("PocketBuildings");
             }
         }
@@ -288,7 +289,7 @@ namespace Client.ViewModel
         {
             if (ChatText == "") { return; }
             Send("3|2|" + RNum + "|" + SNum + "|" + GamePlayerList[SNum - 1].Nick+"|"+ChatText+"|");
-            ChatLog += (GamePlayerList[SNum - 1].Nick + ":" + ChatText + "\n");
+            //ChatLog += (GamePlayerList[SNum - 1].Nick+":"+ChatText+"\n");
             ChatText = "";
         }
 
@@ -342,8 +343,8 @@ namespace Client.ViewModel
         //发送消息的函数
         public void Send(string s)
         {
-            BattleLog += ("C2S：" + s+ "*\n");
-            //App.NetCtrl.Send(s);
+            BattleLog += ("\nC2S：" + s+"*");
+            App.NetCtrl.Send(s);
         }
 
         //接收消息的委托
@@ -380,7 +381,6 @@ namespace Client.ViewModel
         //预处理，防止收到两个连续数据包
         void DealReceivePre(string s)
         {
-            BattleLog += ("S2C：" + s + "\n");
             string[] ss = s.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var item in ss)
             {
@@ -427,10 +427,7 @@ namespace Client.ViewModel
                 case "1":
                     PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[3])]);
                     PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[4])]);
-                    foreach (var item in GamePlayerList)
-                    {
-                        item.Money= int.Parse(strs[5]);
-                    }
+                    GamePlayerList[SNum - 1].Money = int.Parse(strs[5]);
                     for (int i = 6; i < strs.Length; i++)
                     {
                         GamePlayerList[i - 6].Nick = strs[i];
@@ -562,7 +559,6 @@ namespace Client.ViewModel
                 case 13: IsCenterBuildingMultiVisable = false; break;
                 default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
-            IsCenterBuildingPocketVisable = false;
             Index = -1;
         }
 
@@ -586,7 +582,6 @@ namespace Client.ViewModel
         //控制台显示手牌的操作
         public void ShowHandCards()
         {
-            CancelSelect();
             IsCenterBuildingPocketVisable = !IsCenterBuildingPocketVisable;
         }
 
@@ -607,7 +602,6 @@ namespace Client.ViewModel
         //我要建设函数
         public void Build()
         {
-            CancelSelect();
             if (!IsStepFinished[8])
             {
                 Step = 8;
@@ -639,7 +633,6 @@ namespace Client.ViewModel
         //我要刺杀函数
         public void Kill()
         {
-            CancelSelect();
             Step = 3;
             IsCenterHeroVisable = true;
             CenterHeros = new ObservableCollection<Hero>();
@@ -665,7 +658,6 @@ namespace Client.ViewModel
         //我要偷取函数
         public void Stole()
         {
-            CancelSelect();
             Step = 4;
             IsCenterHeroVisable = true;
             CenterHeros = new ObservableCollection<Hero>();
@@ -692,7 +684,6 @@ namespace Client.ViewModel
         //我要与玩家交换函数
         public void SwapWithPlayer()
         {
-            CancelSelect();
             Step = 5;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
@@ -717,7 +708,6 @@ namespace Client.ViewModel
         //与牌堆交换函数
         public void SwapWithCards()
         {
-            CancelSelect();
             Step = 14;
             IsCenterBuildingMultiVisable = true;
             CenterBuildings = PocketBuildings;
@@ -740,7 +730,6 @@ namespace Client.ViewModel
         //我要摧毁操作
         public void Destroy()
         {
-            CancelSelect();
             Step = 6;
             IsCenterPlayerVisable = true;
             CenterPlayer = new ObservableCollection<GamePlayer>();
@@ -788,7 +777,6 @@ namespace Client.ViewModel
         //发动实验室函数
         public void Laboratory()
         {
-            CancelSelect();
             CenterBuildings = PocketBuildings;
             Step = 11;
             IsCenterBuildingVisable = true;
@@ -869,6 +857,7 @@ namespace Client.ViewModel
                 _test3Cmd = value;
             }
         }
+        #endregion
 
         string _test3Text;
         public string Test3Text
@@ -885,27 +874,9 @@ namespace Client.ViewModel
             }
         }
 
-        string _testText;
-        public string TestText
-        {
-            get
-            {
-                return _testText;
-            }
 
-            set
-            {
-                _testText = value;
-                RaisePropertyChanged("TestText");
-            }
-        }
-
-        #endregion
-        
         public void Test1()
         {
-            DealReceivePre(TestText);
-            TestText = "";
         }
 
         public void Test2()
@@ -939,7 +910,7 @@ namespace Client.ViewModel
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
-            //ThReceive.Start(App.NetCtrl.SocketClient);
+            ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
@@ -967,7 +938,7 @@ namespace Client.ViewModel
             Send("3|1|1|"+RNum+"|"+SNum+"|");
 
             #region 测试
-            Test1Text = "模拟接收";
+            Test1Text = "测试按钮1";
             Test2Text = "测试按钮2";
             Test3Text = "测试按钮3";
             Test1Cmd = new RelayCommand(new Action(Test1));
