@@ -84,7 +84,7 @@ namespace Server.Processes
                     {
                         s += (item.Nick + "|");
                     }
-                    NetCtrl.Send(socket, s);
+                    NetCtrl.Send(socket, s); 
                     break;
             }
         }
