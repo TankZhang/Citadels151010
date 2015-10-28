@@ -343,8 +343,8 @@ namespace Client.ViewModel
         //发送消息的函数
         public void Send(string s)
         {
-            BattleLog += ("\nC2S：" + s+"*");
-            App.NetCtrl.Send(s);
+            BattleLog += ("C2S：" + s+ "*\n");
+            //App.NetCtrl.Send(s);
         }
 
         //接收消息的委托
@@ -381,6 +381,7 @@ namespace Client.ViewModel
         //预处理，防止收到两个连续数据包
         void DealReceivePre(string s)
         {
+            BattleLog += ("S2C：" + s + "\n");
             string[] ss = s.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var item in ss)
             {
@@ -427,7 +428,10 @@ namespace Client.ViewModel
                 case "1":
                     PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[3])]);
                     PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[4])]);
-                    GamePlayerList[SNum - 1].Money = int.Parse(strs[5]);
+                    foreach (var item in GamePlayerList)
+                    {
+                        item.Money = int.Parse(strs[5]);
+                    }
                     for (int i = 6; i < strs.Length; i++)
                     {
                         GamePlayerList[i - 6].Nick = strs[i];
@@ -873,10 +877,26 @@ namespace Client.ViewModel
                 RaisePropertyChanged("Test3Text");
             }
         }
+        
+        string _testText;
+        public string TestText
+        {
+            get
+            {
+                return _testText;
+            }
 
+            set
+            {
+                _testText = value;
+                RaisePropertyChanged("TestText");
+            }
+        }
 
         public void Test1()
         {
+            DealReceivePre(TestText);
+            TestText = "";
         }
 
         public void Test2()
@@ -910,7 +930,7 @@ namespace Client.ViewModel
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
-            ThReceive.Start(App.NetCtrl.SocketClient);
+            //ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
@@ -938,37 +958,12 @@ namespace Client.ViewModel
             Send("3|1|1|"+RNum+"|"+SNum+"|");
 
             #region 测试
-            Test1Text = "测试按钮1";
+            Test1Text = "测试接收";
             Test2Text = "测试按钮2";
             Test3Text = "测试按钮3";
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
-            //GamePlayerList[0].Nick = "1号玩家";
-            //GamePlayerList[1].Nick = "2号玩家";
-            //GamePlayerList[1].Money = 5;
-            //GamePlayerList[2].Nick = "3号玩家";
-            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[0]);
-            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[10]);
-            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[20]);
-            //GamePlayerList[2].Roles.Add(CardRes.Heros[0]);
-            //GamePlayerList[2].Roles.Add(CardRes.Heros[1]);
-            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[5]);
-            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[15]);
-            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[25]);
-            //GamePlayerList[1].Roles.Add(CardRes.Heros[2]);
-            //GamePlayerList[1].Roles.Add(CardRes.Heros[3]);
-            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[8]);
-            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[18]);
-            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[28]);
-            //GamePlayerList[0].Roles.Add(CardRes.Heros[4]);
-            //GamePlayerList[0].Roles.Add(CardRes.Heros[5]);
-            //CenterHeros.Add(CardRes.Heros[6]);
-            //CenterHeros.Add(CardRes.Heros[7]);
-            //CenterBuildings.Add(CardRes.Buildings[2]);
-            //CenterBuildings.Add(CardRes.Buildings[15]);
-            //PocketBuildings.Add(CardRes.Buildings[2]);
-            //PocketBuildings.Add(CardRes.Buildings[60]);
             #endregion
         }
     }
