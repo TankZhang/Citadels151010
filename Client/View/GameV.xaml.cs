@@ -49,7 +49,7 @@ namespace Client.View
         {
             int num = 3;
             int sNum = 2;
-            int rNum = 3;
+            int rNum = 10;
             gameVM = new GameVM(num, rNum, sNum);
             InitializeComponent();
             DataContext = gameVM;

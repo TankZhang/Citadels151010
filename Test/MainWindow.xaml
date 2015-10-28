@@ -1,0 +1,62 @@
+﻿<Window x:Class="Test.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Test"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="720" Width="1280"
+        SizeChanged="Window_SizeChanged"
+        WindowStyle="None">
+    <!--<Window.DataContext>
+        <local:GameVM x:Name="gameVM"/>
+    </Window.DataContext>-->
+    <Window.Background>
+        <ImageBrush ImageSource="/res/BG.jpg"/>
+    </Window.Background>
+    <Grid ShowGridLines="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="720*"/>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="160*"/>
+                <ColumnDefinition Width="200*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="160*"/>
+                <RowDefinition Height="400*"/>
+                <RowDefinition Height="160*"/>
+            </Grid.RowDefinitions>
+        <local:MyZone x:Name="myZone" DataContext="{Binding PlayerDataList[0]}" Grid.Column="2" Grid.Row="2"></local:MyZone>
+        <local:MyZone x:Name="rightZone" DataContext="{Binding PlayerDataList[1]}" Grid.Column="4" Grid.Row="0" Grid.RowSpan="3" RenderTransformOrigin="0.5,0.5" >
+                <local:MyZone.RenderTransform>
+                    <RotateTransform Angle="0"/>
+                </local:MyZone.RenderTransform>
+                <local:MyZone.LayoutTransform>
+                    <RotateTransform  Angle="270" />
+                </local:MyZone.LayoutTransform>
+            </local:MyZone>
+        <local:MyZone x:Name="upZone" DataContext="{Binding PlayerDataList[1]}" Grid.Column="2" Grid.Row="0" RenderTransformOrigin="0.5,0.5" >
+                <local:MyZone.RenderTransform>
+                    <RotateTransform Angle="0"/>
+                </local:MyZone.RenderTransform>
+                <local:MyZone.LayoutTransform>
+                    <RotateTransform Angle="180" />
+                </local:MyZone.LayoutTransform>
+        </local:MyZone>
+        <StackPanel Grid.Column="5">
+            <Button Height="30" Content="减一个role" Click="Button_Click"></Button>
+            <Button Content="加一个role" Click="Button_Click_1"></Button>
+            <Button Content="减一个build" Click="Button_Click_2"   />
+            <Button Content="加一个build" Click="Button_Click_3"   />
+            <Button Content="加centerHero" Click="Button_Click_4"   />
+        </StackPanel>
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Visibility="Collapsed">
+            <local:CenterHeroUC x:Name="centerHero"></local:CenterHeroUC>
+        </Grid>
+        <Grid  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" >
+            <local:CenterArchBuildingUC x:Name="cABUC"></local:CenterArchBuildingUC>
+        </Grid>
+    </Grid>
+</Window>
