@@ -19,6 +19,8 @@ namespace Server.Datas
         public int FinishCount { get; set; }
         public RoomData()
         {
+            BackB = new List<Building>();
+            BackH = new List<Hero>();
             CardRes cardRes = new CardRes();
             BackB = cardRes.Buildings;
             cardRes.Heros.ForEach(i => BackH.Add(i));

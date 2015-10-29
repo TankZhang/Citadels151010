@@ -342,8 +342,10 @@ namespace Client.ViewModel
         //发送消息的函数
         public void Send(string s)
         {
+            //测试
             BattleLog += ("C2S：" + s+ "*\n");
-            //App.NetCtrl.Send(s);
+
+            App.NetCtrl.Send(s);
         }
 
         //接收消息的委托
@@ -365,7 +367,6 @@ namespace Client.ViewModel
                         break;
                     }
                     string str = Encoding.UTF8.GetString(buffer, 0, r);
-                    //DealReceivePre(str);
                     Console.WriteLine("game收到了：" + str);
                     Application.Current.Dispatcher.Invoke(del, str);
                 }//try结束
@@ -380,7 +381,6 @@ namespace Client.ViewModel
         //预处理，防止收到两个连续数据包
         void DealReceivePre(string s)
         {
-            BattleLog += ("S2C：" + s + "\n");
             string[] ss = s.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var item in ss)
             {
@@ -391,6 +391,9 @@ namespace Client.ViewModel
         //处理game收到的信息
         private void DealReceive(string item)
         {
+            //测试
+            BattleLog += ("S2C：" + item + "\n");
+
             string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "3") { return; }
             switch(strs[1])
@@ -406,32 +409,42 @@ namespace Client.ViewModel
 
             }
         }
+
         //处理得到的英雄相关的数据
         private void DealHero(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
-                //选英雄的返回
+                //选英雄的信息
                 case "1":
                     CenterHeros.Clear();
                     for (int i = 3; i < strs.Length; i++)
                     {
                         CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
                     }
+                    IsStepFinished[1] = false;
                     Step = 1;
                     IsCenterBuildingPocketVisable = false;
                     IsCenterHeroVisable = true;
-                    break;
+                    return;
+                    //盖下英雄的信息
                 case "2":
                     CenterHeros.Clear();
+                    IsStepFinished[2] = false;
                     for (int i = 3; i < strs.Length; i++)
                     {
                         CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
                     }
                     Step = 2;
                     IsCenterBuildingPocketVisable = false;
-                    IsCenterHeroVisable = true;
-                    break;
+                    Task t = new Task(() =>
+                    {
+                        Thread.Sleep(200);
+                        IsCenterHeroVisable = true;
+                    });
+                    t.Start();
+                    //IsCenterHeroVisable = true;
+                    return;
             }
         }
 
@@ -538,38 +551,36 @@ namespace Client.ViewModel
         //中间list单选点击时的操作
         public void Select()
         {
+            if (Index < 0) { return; }
+            if (IsStepFinished[Step]) { return; }
+            IsStepFinished[Step] = true;
             switch (Step)
             {
                 case 1:
+                    GamePlayerList[SNum - 1].Roles.Add(CenterHeros[Index]);
+                    IsCenterHeroVisable = false;
+                    Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
+                    Index = -1;
+                    return;
                 case 2:
+                    IsCenterHeroVisable = false;
+                    Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
+                    Index = -1;
+                    return;
                 case 3:
                 case 4:
-                    if (Index < 0) { return; }
-                    if (IsStepFinished[Step]) { return; }
-                    IsStepFinished[Step] = true;
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
-                    Console.WriteLine("您选择的角色为" + CenterHeros[Index].Name);
-                    CancelSelect();
                     break;
                 case 5:
                 case 6:
-                    if (Index < 0) { return; }
-                    if (IsStepFinished[Step]) { return; }
-                    IsStepFinished[Step] = true;
                     Console.WriteLine("您选择的玩家为" + CenterPlayer[Index].Nick);
-                    CancelSelect();
                     break;
                 case 7:
                 case 8:
                 case 9:
                 case 10:
                 case 11:
-                    if (Index < 0) { return; }
-                    if (IsStepFinished[Step]) { return; }
-                    IsStepFinished[Step] = true;
-                    RaisePropertyChanged("IsStepFinished");
                     Console.WriteLine("您单选的建筑为" + CenterBuildings[Index].Name);
-                    CancelSelect();
                     break;
                 default: return;
             }
@@ -987,7 +998,7 @@ namespace Client.ViewModel
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
-            //ThReceive.Start(App.NetCtrl.SocketClient);
+            ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
@@ -1009,7 +1020,7 @@ namespace Client.ViewModel
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";
             Index = -1;
             Step = 8;
-            IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,false,false,false,false, false,
+            IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,false,false, false,
                 false, false, false, false, false, false, true, false,false });
 
             Send("3|1|1|"+RNum+"|"+SNum+"|");
@@ -1021,17 +1032,21 @@ namespace Client.ViewModel
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
-            GamePlayerList[0].Nick = "默认1";
-            GamePlayerList[1].Nick = "默认2";
-            GamePlayerList[2].Nick = "默认3";
-            GamePlayerList[0].Buildings.Add(CardRes.Buildings[12]);
-            GamePlayerList[0].Buildings.Add(CardRes.Buildings[14]);
-            GamePlayerList[1].Buildings.Add(CardRes.Buildings[17]);
-            GamePlayerList[1].Buildings.Add(CardRes.Buildings[19]);
-            GamePlayerList[2].Buildings.Add(CardRes.Buildings[24]);
-            GamePlayerList[2].Buildings.Add(CardRes.Buildings[29]);
-            PocketBuildings.Add(CardRes.Buildings[34]);
-            PocketBuildings.Add(CardRes.Buildings[39]);
+
+            //#region 默认卡牌
+            //GamePlayerList[0].Nick = "默认1";
+            //GamePlayerList[1].Nick = "默认2";
+            //GamePlayerList[2].Nick = "默认3";
+            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[12]);
+            //GamePlayerList[0].Buildings.Add(CardRes.Buildings[14]);
+            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[17]);
+            //GamePlayerList[1].Buildings.Add(CardRes.Buildings[19]);
+            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[24]);
+            //GamePlayerList[2].Buildings.Add(CardRes.Buildings[29]);
+            //PocketBuildings.Add(CardRes.Buildings[34]);
+            //PocketBuildings.Add(CardRes.Buildings[39]);
+            //#endregion
+
             #endregion
         }
     }

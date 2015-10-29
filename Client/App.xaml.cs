@@ -20,9 +20,13 @@ namespace Client
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            //NetCtrl.SocketClient.Disconnect(false);
-            //NetCtrl.SocketClient.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-            //NetCtrl.SocketClient.Close();
+            try
+            {
+                NetCtrl.SocketClient.Disconnect(false);
+                NetCtrl.SocketClient.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                NetCtrl.SocketClient.Close();
+            }
+            catch { }
         }
     }
 }

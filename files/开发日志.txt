@@ -105,6 +105,10 @@ CenterBuildingPocketUC.xaml
 客户端：
 	收到选英雄时候，将CenterHeros清零后加入收到的ID，然后置Step为1，关闭中间手牌显示，然后显示中央Hero。
 	收到盖下英雄时候，将CenterHeros清零后加入收到的ID，然后置Step为2，关闭中间手牌显示，然后显示中央Hero。
+服务器：
+	当FinishCount为0时，首先去掉一张牌，然后给下家选牌。
+	选牌结束后盖牌，如果是第一个就下个人选牌，否则就盖牌。
+	最后一个人选完后将FinishCount置零，开始游戏。
 	
 
 	
