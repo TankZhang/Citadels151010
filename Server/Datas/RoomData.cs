@@ -16,16 +16,18 @@ namespace Server.Datas
         public List<Hero> TableH { set; get; }
         public Dictionary<int, int> Hero2PlayerDic { set; get; }
         public string Status{set; get;}
+        public int FinishCount { get; set; }
         public RoomData()
         {
             CardRes cardRes = new CardRes();
             BackB = cardRes.Buildings;
-            BackH = cardRes.Heros;
+            cardRes.Heros.ForEach(i => BackH.Add(i));
             TableB = new List<Building>();
             TableH = new List<Hero>();
             Hero2PlayerDic = new Dictionary<int, int>();
             PlayerDataList = new List<PlayerData>();
             Status = "未开始";
+            FinishCount = 0;
         }
     }
 }

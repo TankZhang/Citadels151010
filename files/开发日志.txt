@@ -94,7 +94,19 @@ CenterBuildingPocketUC.xaml
 	游戏界面收到首先判断是不是开头为3，否则return。
 	完成聊天工作。
 	在收到初始信息时更新我的牌堆。
+#15.20.29
+服务器：
+	RoomData加入了int FinishCount标志，标志游戏过程中大家的回复的数量。
+	每次收到初始更新请求则FinishCount++，当FinishCount为人数数量时，
+	FinishCount变为0，开始请第FinishCount位玩家抽牌，判断FinishCount的值，如果是0，则首先自动盖一张，
+	然后将BackHerosId发给国王后面的第FinishCount位玩家，
+	判断人数选择2人模式还是多人模式。2人模式选人会对应多，多人模式每人只能选一张。
+	首先找到对应FinishCount的座号，发送要选的角色ID，然后发战报给房间中的每个人。
+客户端：
+	收到选英雄时候，将CenterHeros清零后加入收到的ID，然后置Step为1，关闭中间手牌显示，然后显示中央Hero。
+	收到盖下英雄时候，将CenterHeros清零后加入收到的ID，然后置Step为2，关闭中间手牌显示，然后显示中央Hero。
 	
+
 	
 	
 	

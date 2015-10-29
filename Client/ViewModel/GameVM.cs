@@ -401,20 +401,67 @@ namespace Client.ViewModel
                 //聊天数据
                 case "2":DealChat(strs);
                     break;
+                case "3":DealHero(strs);
+                    break;
 
+            }
+        }
+        //处理得到的英雄相关的数据
+        private void DealHero(string[] strs)
+        {
+            switch(strs[2])
+            {
+                //选英雄的返回
+                case "1":
+                    CenterHeros.Clear();
+                    for (int i = 3; i < strs.Length; i++)
+                    {
+                        CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
+                    }
+                    Step = 1;
+                    IsCenterBuildingPocketVisable = false;
+                    IsCenterHeroVisable = true;
+                    break;
+                case "2":
+                    CenterHeros.Clear();
+                    for (int i = 3; i < strs.Length; i++)
+                    {
+                        CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
+                    }
+                    Step = 2;
+                    IsCenterBuildingPocketVisable = false;
+                    IsCenterHeroVisable = true;
+                    break;
             }
         }
 
         //处理聊天数据
         private void DealChat(string[] strs)
         {
-            if(int.Parse(strs[2])==SNum)
+            switch(strs[2])
             {
-                ChatLog += ("我：" + strs[3] + "\n");
-            }
-            else
-            {
-                ChatLog += (GamePlayerList[int.Parse(strs[2]) - 1].Nick + ":" + strs[3] + "\n");
+                //战报
+                case "1":
+                    if (int.Parse(strs[3]) == SNum)
+                    {
+                        BattleLog += ("我：" + strs[4] + "\n");
+                    }
+                    else
+                    {
+                        BattleLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + strs[4] + "\n");
+                    }
+                    break;
+                //聊天信息
+                case "2":
+                    if (int.Parse(strs[3]) == SNum)
+                    {
+                        ChatLog += ("我：" + strs[4] + "\n");
+                    }
+                    else
+                    {
+                        ChatLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + strs[4] + "\n");
+                    }
+                    break;
             }
         }
 
@@ -500,6 +547,7 @@ namespace Client.ViewModel
                     if (Index < 0) { return; }
                     if (IsStepFinished[Step]) { return; }
                     IsStepFinished[Step] = true;
+                    Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     Console.WriteLine("您选择的角色为" + CenterHeros[Index].Name);
                     CancelSelect();
                     break;
