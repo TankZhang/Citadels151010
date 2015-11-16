@@ -287,7 +287,7 @@ namespace Client.ViewModel
         public void Chat()
         {
             if (ChatText == "") { return; }
-            Send("3|2|" + RNum + "|" + SNum + "|" + GamePlayerList[SNum - 1].Nick+"|"+ChatText+"|");
+            Send("3|2|" + RNum + "|" + SNum + "|" + GamePlayerList[SNum - 1].Nick + "|" + ChatText + "|");
             //ChatLog += (GamePlayerList[SNum - 1].Nick+":"+ChatText+"\n");
             ChatText = "";
         }
@@ -343,7 +343,7 @@ namespace Client.ViewModel
         public void Send(string s)
         {
             //测试
-            BattleLog += ("C2S：" + s+ "*\n");
+            BattleLog += ("C2S：" + s + "*\n");
 
             App.NetCtrl.Send(s);
         }
@@ -396,17 +396,35 @@ namespace Client.ViewModel
 
             string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "3") { return; }
-            switch(strs[1])
+            switch (strs[1])
             {
                 //回复数据
-                case "1":DealData(strs);
+                case "1":
+                    DealData(strs);
                     break;
                 //聊天数据
-                case "2":DealChat(strs);
+                case "2":
+                    DealChat(strs);
                     break;
-                case "3":DealHero(strs);
+                //英雄数据
+                case "3":
+                    DealHero(strs);
                     break;
+                //回合相关
+                case "4":
+                    DealRound(strs);
+                    break;
+            }
+        }
 
+        //处理回合相关的数据。
+        private void DealRound(string[] strs)
+        {
+            switch(strs[2])
+            {
+                case "1":
+
+                    break;
             }
         }
 
@@ -427,7 +445,7 @@ namespace Client.ViewModel
                     IsCenterBuildingPocketVisable = false;
                     IsCenterHeroVisable = true;
                     return;
-                    //盖下英雄的信息
+                //盖下英雄的信息
                 case "2":
                     CenterHeros.Clear();
                     IsStepFinished[2] = false;
@@ -451,18 +469,11 @@ namespace Client.ViewModel
         //处理聊天数据
         private void DealChat(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
                 //战报
                 case "1":
-                    if (int.Parse(strs[3]) == SNum)
-                    {
-                        BattleLog += ("我：" + strs[4] + "\n");
-                    }
-                    else
-                    {
-                        BattleLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + strs[4] + "\n");
-                    }
+                    DealBattleLog(strs);
                     break;
                 //聊天信息
                 case "2":
@@ -477,11 +488,41 @@ namespace Client.ViewModel
                     break;
             }
         }
+        //处理战报的详细过程
+        private void DealBattleLog(string[] strs)
+        {
+            string s="";
+            switch (strs[4])
+            {
+                //英雄相关的战报
+                case "1":
+                    string[] ss = { "", "正在选角色", "选择了一个角色", "正在选择盖下的角色", "盖下了一个角色" };
+                    s = ss[int.Parse(strs[5])];
+                    break;
+                //回合相关的战报
+                case "2":
+                    if (strs[5] == "1")
+                    {
+                        string[] heros = { "", "刺客", "盗贼", "魔术师", "国王", "主教", "商人", "建筑师", "军阀" };
+                        s = "作为" + heros[int.Parse(strs[6])] + "的回合开始";
+                    }
+                    break;
+                default:s = "处理战报时收到了意外的值";break;
+            }
+            if (int.Parse(strs[3]) == SNum)
+            {
+                BattleLog += ("我：" + s + "\n");
+            }
+            else
+            {
+                BattleLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + s + "\n");
+            }
+        }
 
         //处理返回的数据
         private void DealData(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
                 //此处为回复的是初始数据
                 case "1":
@@ -945,7 +986,7 @@ namespace Client.ViewModel
                 RaisePropertyChanged("Test3Text");
             }
         }
-        
+
         string _testText;
         public string TestText
         {
@@ -976,7 +1017,7 @@ namespace Client.ViewModel
         }
         #endregion
 
-        
+
         //构造函数
         public GameVM(int num, int rNum, int sNum)
         {
@@ -1023,7 +1064,7 @@ namespace Client.ViewModel
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,false,false, false,
                 false, false, false, false, false, false, true, false,false });
 
-            Send("3|1|1|"+RNum+"|"+SNum+"|");
+            Send("3|1|1|" + RNum + "|" + SNum + "|");
 
             #region 测试
             Test1Text = "测试接收";

@@ -94,7 +94,7 @@ CenterBuildingPocketUC.xaml
 	游戏界面收到首先判断是不是开头为3，否则return。
 	完成聊天工作。
 	在收到初始信息时更新我的牌堆。
-#15.20.29
+#15.10.29
 服务器：
 	RoomData加入了int FinishCount标志，标志游戏过程中大家的回复的数量。
 	每次收到初始更新请求则FinishCount++，当FinishCount为人数数量时，
@@ -109,6 +109,14 @@ CenterBuildingPocketUC.xaml
 	当FinishCount为0时，首先去掉一张牌，然后给下家选牌。
 	选牌结束后盖牌，如果是第一个就下个人选牌，否则就盖牌。
 	最后一个人选完后将FinishCount置零，开始游戏。
+#15.11.16
+协议：
+	改变战报格式，加入字段代表战报类型。
+服务器：
+	加入FinishCount的另一个功能，控制回合。
+	最后一个人选完之后，FinishCount置零，开始回合，FinishCount自加，向某个人发送回合开始信息。
+	向房间内部发送某人作为某个角色开始回合。
+
 	
 
 	
