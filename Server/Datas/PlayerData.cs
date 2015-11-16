@@ -151,33 +151,47 @@ namespace Server.Datas
             {
                 _isKing = value;
             }
-        }
+        }      
 
-        bool _isStole;
-        public bool IsStole
+        int _stoledNum;
+        public int StoledNum
         {
             get
             {
-                return _isStole;
+                return _stoledNum;
             }
 
             set
             {
-                _isStole = value;
+                _stoledNum = value;
             }
         }
 
-        bool _isKill;
-        public bool IsKill
+        bool _isStoling;
+        public bool IsStoling
         {
             get
             {
-                return _isKill;
+                return _isStoling;
             }
 
             set
             {
-                _isKill = value;
+                _isStoling = value;
+            }
+        }
+
+        int _killedNum;
+        public int KilledNum
+        {
+            get
+            {
+                return _killedNum;
+            }
+
+            set
+            {
+                _killedNum = value;
             }
         }
 
@@ -260,8 +274,9 @@ namespace Server.Datas
             RNum = -1;
             SNum = -1;
             IsKing = false;
-            IsStole = false;
-            IsKill = false;
+            StoledNum = -1;
+            IsStoling = false;
+            KilledNum = -1;
             IsFirst = false;
             IsSecond = false;
             Money = -1;

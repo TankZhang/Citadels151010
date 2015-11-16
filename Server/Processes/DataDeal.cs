@@ -228,12 +228,35 @@ namespace Server.Processes
                 return;
             }
             dataCenter.RoomDataDic[rNum].FinishCount++;
+            //如果有玩家选了叫到的角色
             if(dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(dataCenter.RoomDataDic[rNum].FinishCount))
             {
                 int sNum = dataCenter.RoomDataDic[rNum].Hero2PlayerDic[dataCenter.RoomDataDic[rNum].FinishCount];
+                dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Remove(dataCenter.RoomDataDic[rNum].FinishCount);
+                //如果被偷，后台操作钱之后通知到小偷和被偷者,并更新战报，并将被偷归零
+                if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum-1].StoledNum== dataCenter.RoomDataDic[rNum].FinishCount)
+                {
+                    int money = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money;
+                    int stoleNum = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(s => s.IsStoling == true) + 1;
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money = 0;
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Money += money;
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|2|");
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Socket, "3|5|1|"+ dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Money + "|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|1|" + stoleNum + "|"+ dataCenter.RoomDataDic[rNum].FinishCount + "|"+money+"|");
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].StoledNum = -1;
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].IsStoling = false;
+                }
+                //如果被杀，通知全体，通知个人，然后将被杀归零,叫到下家开始回合
+                if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum== dataCenter.RoomDataDic[rNum].FinishCount)
+                {
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|3|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|4|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum = -1;
+                    SendRoundStart(dataCenter, rNum);
+                    return;
+                }
                 NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|4|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                 SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
-                dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Remove(dataCenter.RoomDataDic[rNum].FinishCount);
                 return;
             }
         }

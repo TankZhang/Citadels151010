@@ -233,6 +233,7 @@ namespace Client.ViewModel
                 RaisePropertyChanged("IsStepFinished");
             }
         }
+
         #endregion
 
         #region 右侧聊天控制
@@ -414,6 +415,28 @@ namespace Client.ViewModel
                 case "4":
                     DealRound(strs);
                     break;
+                //钱相关
+                case "5":
+                    DealMoney(strs);
+                    break;
+            }
+        }
+
+        //处理钱相关的数据
+        private void DealMoney(string[] strs)
+        {
+            switch(strs[2])
+            {
+                //偷成功
+                case "1":
+                    GamePlayerList[SNum - 1].Money = int.Parse(strs[3]);
+                    break;
+                //被偷成功
+                case "2":
+                    GamePlayerList[SNum - 1].Money = 0;
+                    break;
+
+
             }
         }
 
@@ -422,8 +445,19 @@ namespace Client.ViewModel
         {
             switch(strs[2])
             {
+                //回合开始
                 case "1":
-
+                    //初始化IsStepFinished
+                    for (int i = 0; i < IsStepFinished.Count; i++)
+                    {
+                        IsStepFinished[i] = true;
+                    }
+                    //按照角色将IsStepFinished置否
+                    switch(strs[3])
+                    {
+                        case "1":
+                            return;
+                    }
                     break;
             }
         }
@@ -462,6 +496,16 @@ namespace Client.ViewModel
                     });
                     t.Start();
                     //IsCenterHeroVisable = true;
+                    return;
+                //被杀害
+                case "3":
+                    for (int i = 0; i < GamePlayerList[SNum-1].Roles.Count; i++)
+                    {
+                        if(GamePlayerList[SNum - 1].Roles[i].Id==int.Parse(strs[3]))
+                        {
+                            GamePlayerList[SNum - 1].Roles.RemoveAt(i);
+                        }
+                    }
                     return;
             }
         }
@@ -506,6 +550,17 @@ namespace Client.ViewModel
                         string[] heros = { "", "刺客", "盗贼", "魔术师", "国王", "主教", "商人", "建筑师", "军阀" };
                         s = "作为" + heros[int.Parse(strs[6])] + "的回合开始";
                     }
+                    break;
+                //钱相关的战报
+                case "3":
+                    if(strs[5]=="1")
+                    {
+                        s="作为"+CardRes.Heros[int.Parse(strs[7])].Name+"被"+ GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了"+strs[8]+"个钱！";
+                    }
+                    break;
+                //被杀害
+                case "4":
+                    s = "作为" + CardRes.Heros[int.Parse(strs[5])].Name + "被杀！";
                     break;
                 default:s = "处理战报时收到了意外的值";break;
             }
