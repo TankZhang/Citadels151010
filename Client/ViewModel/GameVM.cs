@@ -346,7 +346,7 @@ namespace Client.ViewModel
             //测试
             BattleLog += ("C2S：" + s + "*\n");
 
-            App.NetCtrl.Send(s);
+            //App.NetCtrl.Send(s);
         }
 
         //接收消息的委托
@@ -452,10 +452,91 @@ namespace Client.ViewModel
                     {
                         IsStepFinished[i] = true;
                     }
-                    //按照角色将IsStepFinished置否
-                    switch(strs[3])
+                    //按照关键牌将IsStepFinished置否
+                    foreach (Building item in GamePlayerList[SNum-1].Buildings)
                     {
+                        //天文台选择地区时可以从三个里面选
+                        if(item.Name=="天文台")
+                        {
+                            IsStepFinished[10] = false;
+                            continue;
+                        }
+                        //实验室可以丢弃一张手牌得到金币
+                        if(item.Name=="实验室")
+                        {
+                            IsStepFinished[11] = false;
+                            continue;
+                        }
+                        //图书馆选地区时可以保留两张地区牌
+                        if(item.Name=="图书馆")
+                        {
+                            IsStepFinished[13] = false;
+                            continue;
+                        }
+                    }
+                    if(IsStepFinished[10]&&IsStepFinished[13])
+                    {
+                        IsStepFinished[10] = true;
+                        IsStepFinished[13] = true;
+                        IsStepFinished[15] = false;
+                    }
+                    //按照角色将IsStepFinished置否
+                    switch (strs[3])
+                    {
+                        //刺客
                         case "1":
+                            IsStepFinished[3] = false;
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            return;
+                        //盗贼
+                        case "2":
+                            IsStepFinished[4] = false;
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            IsStepFinished[14] = false;
+                            return;
+                            //魔术师
+                        case "3":
+                            IsStepFinished[5] = false;
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            IsStepFinished[14] = false;
+                            return;
+                        //国王
+                        case "4":
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            return;
+                        //主教
+                        case "5":
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            return;
+                        //商人
+                        case "6":
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            return;
+                        //建筑师
+                        case "7":
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[12] = false;
+                            return;
+                        //军阀
+                        case "8":
+                            if (!(IsStepFinished[10] || IsStepFinished[13] || IsStepFinished[15]))
+                            { IsStepFinished[7] = false; }
+                            IsStepFinished[8] = false;
+                            IsStepFinished[6] = false;
+                            IsStepFinished[9] = false;
                             return;
                     }
                     break;
@@ -666,10 +747,12 @@ namespace Client.ViewModel
                 case 3:
                 case 4:
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
+                    IsCenterHeroVisable = false;
                     break;
                 case 5:
                 case 6:
                     Console.WriteLine("您选择的玩家为" + CenterPlayer[Index].Nick);
+                    IsCenterPlayerVisable = false;
                     break;
                 case 7:
                 case 8:
@@ -677,6 +760,7 @@ namespace Client.ViewModel
                 case 10:
                 case 11:
                     Console.WriteLine("您单选的建筑为" + CenterBuildings[Index].Name);
+                    IsCenterBuildingVisable = false;
                     break;
                 default: return;
             }
@@ -742,7 +826,10 @@ namespace Client.ViewModel
         //控制台显示手牌的操作
         public void ShowHandCards()
         {
-            CancelSelect();
+            IsCenterHeroVisable = false;
+            IsCenterPlayerVisable = false;
+            IsCenterBuildingVisable = false;
+            IsCenterBuildingMultiVisable = false;
             IsCenterBuildingPocketVisable = !IsCenterBuildingPocketVisable;
         }
 
@@ -1094,7 +1181,7 @@ namespace Client.ViewModel
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
-            ThReceive.Start(App.NetCtrl.SocketClient);
+            //ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
@@ -1117,7 +1204,7 @@ namespace Client.ViewModel
             Index = -1;
             Step = 8;
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,false,false, false,
-                false, false, false, false, false, false, true, false,false });
+                false, false, false, false, false, false, true, false,false,false });
 
             Send("3|1|1|" + RNum + "|" + SNum + "|");
 

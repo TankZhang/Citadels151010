@@ -11,7 +11,7 @@
             <Button  Content="{Binding Test1Text}"  
                      Command="{Binding Test1Cmd}"/>
             <TextBox Text="{Binding TestText}"
-                     Background="Transparent"
+                     Background="Black"
                      Foreground="White"/>
             <Button  Content="{Binding Test2Text}"  
                      Command="{Binding Test2Cmd}"/>
