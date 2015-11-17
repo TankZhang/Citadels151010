@@ -446,7 +446,7 @@ namespace Client.ViewModel
         //处理建筑相关的数据
         private void DealBuilding(string[] strs)
         {
-            switch(strs[2])
+            switch (strs[2])
             {
                 case "1":
                     DealBuilding1(strs);
@@ -458,7 +458,7 @@ namespace Client.ViewModel
         private void DealBuilding1(string[] strs)
         {
             //单选时候
-            if(!(IsStepFinished[7]&&IsStepFinished[10]))
+            if (!(IsStepFinished[7] && IsStepFinished[10]))
             {
                 if (!IsStepFinished[7])
                 { Step = 7; }
@@ -511,6 +511,8 @@ namespace Client.ViewModel
             }
         }
 
+        #region 处理回合相关的数据
+
         //处理回合相关的数据。
         private void DealRound(string[] strs)
         {
@@ -518,101 +520,116 @@ namespace Client.ViewModel
             {
                 //回合开始
                 case "1":
-                    IsCenterRoundStartVisible = true;
-                    //初始化IsStepFinished
-                    for (int i = 0; i < IsStepFinished.Count; i++)
-                    {
-                        IsStepFinished[i] = true;
-                    }
-                    //按照关键牌将IsStepFinished置否
-                    foreach (Building item in GamePlayerList[SNum - 1].Buildings)
-                    {
-                        //天文台选择地区时可以从三个里面选
-                        if (item.Name == "天文台")
-                        {
-                            IsStepFinished[10] = false;
-                            continue;
-                        }
-                        //实验室可以丢弃一张手牌得到金币
-                        if (item.Name == "实验室")
-                        {
-                            IsStepFinished[11] = false;
-                            continue;
-                        }
-                        //图书馆选地区时可以保留两张地区牌
-                        if (item.Name == "图书馆")
-                        {
-                            IsStepFinished[13] = false;
-                            continue;
-                        }
-                    }
-                    if (!(IsStepFinished[10] || IsStepFinished[13]))
-                    {
-                        IsStepFinished[10] = true;
-                        IsStepFinished[13] = true;
-                        IsStepFinished[15] = false;
-                    }
-                    //按照角色将IsStepFinished置否
-                    switch (strs[3])
-                    {
-                        //刺客
-                        case "1":
-                            IsStepFinished[3] = false;
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            return;
-                        //盗贼
-                        case "2":
-                            IsStepFinished[4] = false;
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            return;
-                        //魔术师
-                        case "3":
-                            IsStepFinished[5] = false;
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            IsStepFinished[14] = false;
-                            return;
-                        //国王
-                        case "4":
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            return;
-                        //主教
-                        case "5":
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            return;
-                        //商人
-                        case "6":
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            return;
-                        //建筑师
-                        case "7":
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[12] = false;
-                            return;
-                        //军阀
-                        case "8":
-                            if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
-                            { IsStepFinished[7] = false; }
-                            IsStepFinished[8] = false;
-                            IsStepFinished[6] = false;
-                            IsStepFinished[9] = false;
-                            return;
-                    }
+                    DealRound1(strs);
                     break;
             }
         }
+
+        //处理回合开始时
+        private void DealRound1(string[] strs)
+        {
+            IsCenterRoundStartVisible = true;
+            //初始化IsStepFinished
+            for (int i = 0; i < IsStepFinished.Count; i++)
+            {
+                IsStepFinished[i] = true;
+            }
+            //按照关键牌将IsStepFinished置否
+            foreach (Building item in GamePlayerList[SNum - 1].Buildings)
+            {
+                //天文台选择地区时可以从三个里面选
+                if (item.Name == "天文台")
+                {
+                    IsStepFinished[10] = false;
+                    continue;
+                }
+                //实验室可以丢弃一张手牌得到金币
+                if (item.Name == "实验室")
+                {
+                    IsStepFinished[11] = false;
+                    continue;
+                }
+                //图书馆选地区时可以保留两张地区牌
+                if (item.Name == "图书馆")
+                {
+                    IsStepFinished[13] = false;
+                    continue;
+                }
+                //检查可以发动铁匠铺
+                if (item.Name == "铁匠铺")
+                {
+                    IsBlacksmithExist = true;
+                    continue;
+                }
+            }
+            if (!(IsStepFinished[10] || IsStepFinished[13]))
+            {
+                IsStepFinished[10] = true;
+                IsStepFinished[13] = true;
+                IsStepFinished[15] = false;
+            }
+
+            //按照角色将IsStepFinished置否
+            switch (strs[3])
+            {
+                //刺客
+                case "1":
+                    IsStepFinished[3] = false;
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    break;
+                //盗贼
+                case "2":
+                    IsStepFinished[4] = false;
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    break;
+                //魔术师
+                case "3":
+                    IsStepFinished[5] = false;
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    IsStepFinished[14] = false;
+                    break;
+                //国王
+                case "4":
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    break;
+                //主教
+                case "5":
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    break;
+                //商人
+                case "6":
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    break;
+                //建筑师
+                case "7":
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[12] = false;
+                    break;
+                //军阀
+                case "8":
+                    if (IsStepFinished[10] && IsStepFinished[13] && IsStepFinished[15])
+                    { IsStepFinished[7] = false; }
+                    IsStepFinished[8] = false;
+                    IsStepFinished[6] = false;
+                    IsStepFinished[9] = false;
+                    break;
+            }
+        }
+
+        #endregion
 
         //处理得到的英雄相关的数据
         private void DealHero(string[] strs)
@@ -684,6 +701,8 @@ namespace Client.ViewModel
                     break;
             }
         }
+
+        #region 处理战报的过程
         //处理战报的详细过程
         private void DealBattleLog(string[] strs)
         {
@@ -705,15 +724,27 @@ namespace Client.ViewModel
                     break;
                 //钱相关的战报
                 case "3":
-                    if (strs[5] == "1")
+                    switch (strs[5])
                     {
-                        s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "被" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了" + strs[8] + "个钱！";
+                        //偷成功
+                        case "1":
+                            s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "被" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了" + strs[8] + "个钱！";
+                            break;
+                        //选择拿钱
+                        case "2":
+                            s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "选择了拿钱";
+                            break;
                     }
                     break;
                 //被杀害
                 case "4":
                     s = "作为" + CardRes.Heros[int.Parse(strs[5])].Name + "被杀！";
                     break;
+                //建筑相关
+                case "5":
+                    s = DealBattleLog5(strs);
+                    break;
+
                 default: s = "处理战报时收到了意外的值"; break;
             }
             if (int.Parse(strs[3]) == SNum)
@@ -725,6 +756,42 @@ namespace Client.ViewModel
                 BattleLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + s + "\n");
             }
         }
+
+        //建筑相关的战报
+        private string DealBattleLog5(string[] strs)
+        {
+            string s = "";
+            switch (strs[5])
+            {
+                //正在选择建筑
+                case "1":
+                    s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "正在选择建筑";
+                    break;
+                //建筑了建筑
+                case "2":
+                    //单个建筑
+                    if (strs[6] == "1")
+                    {
+                        s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "建筑了" + CardRes.Buildings[int.Parse(strs[8])].Name;
+                        GamePlayerList[int.Parse(strs[3]) - 1].Buildings.Add(CardRes.Buildings[int.Parse(strs[8])]);
+                    }
+                    //多个建筑
+                    if (strs[6] == "2")
+                    {
+                        s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "建筑了";
+                        GamePlayerList[int.Parse(strs[3]) - 1].Buildings.Add(CardRes.Buildings[int.Parse(strs[8])]);
+                        for (int i = 8; i < strs.Length; i++)
+                        {
+                            s += (CardRes.Buildings[int.Parse(strs[i])].Name + "、");
+                            GamePlayerList[int.Parse(strs[3]) - 1].Buildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
+                        }
+                    }
+                    break;
+            }
+            return s;
+        }
+
+        #endregion
 
         //处理返回的数据
         private void DealData(string[] strs)
@@ -771,14 +838,34 @@ namespace Client.ViewModel
             IsCenterBuildingMultiVisable = false;
             if (IsStepFinished[Step]) { return; }
             IsStepFinished[Step] = true;
-            if (Step == 14) IsStepFinished[5] = true;
-            RaisePropertyChanged("IsStepFinished");
+            string s = "";
             IEnumerable a = (IEnumerable)o;
             foreach (var item in a)
             {
                 Building b = item as Building;
-                Console.Write(b.Name);
-                Console.WriteLine("");
+                s += (b.Id + "|");
+                PocketBuildings.Remove(b);
+            }
+            switch (Step)
+            {
+                //建筑师建筑牌
+                case 12:
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "2|2|" + s);
+                    break;
+                //图书馆选择牌
+                case 13:
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "3|" + s);
+                    break;
+                //魔术师与牌堆交换选择牌
+                case 14:
+                    IsStepFinished[5] = true;
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "4|" + s);
+                    break;
+                //天文台和图书馆同时用的时候的选择牌
+                case 15:
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "3|" + s);
+                    break;
+                default: break;
             }
         }
 
@@ -826,14 +913,19 @@ namespace Client.ViewModel
                     IsCenterPlayerVisable = false;
                     break;
                 case 7:
+                //普通建设
                 case 8:
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "2|1|" + CenterBuildings[Index].Id + "|");
+                    PocketBuildings.Remove(CenterBuildings[Index]);
+                    Index = -1;
+                    break;
                 case 9:
                 case 10:
                 case 11:
                     Console.WriteLine("您单选的建筑为" + CenterBuildings[Index].Name);
                     IsCenterBuildingVisable = false;
                     break;
-                default: return;
+                default: break;
             }
         }
 
@@ -894,7 +986,7 @@ namespace Client.ViewModel
         public void SelectMoney()
         {
             IsCenterRoundStartVisible = false;
-            Send("3|5|" + RNum + "|" + SNum + "|"+ "1|");
+            Send("3|5|" + RNum + "|" + SNum + "|" + "1|");
         }
 
         //中间选择拿牌的操作
@@ -916,7 +1008,7 @@ namespace Client.ViewModel
         public void SelectBuilding()
         {
             IsCenterRoundStartVisible = false;
-            if(!(IsStepFinished[7]&&IsStepFinished[13]))
+            if (!(IsStepFinished[7] && IsStepFinished[13]))
             {
                 Send("3|6|" + RNum + "|" + SNum + "|" + "1|1|");
             }
@@ -1325,7 +1417,7 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
             IsCenterRoundStartVisible = false;
-             ChatText = "";
+            ChatText = "";
             ChatLog = "";
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";
             Index = -1;

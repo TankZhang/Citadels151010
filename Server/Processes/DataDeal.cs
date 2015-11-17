@@ -56,7 +56,7 @@ namespace Server.Processes
             {
                 //处理请求数据信息
                 case "1":
-                    DealGameData1(dataCenter, socket, strs);
+                    DealGameInfo(dataCenter, socket, strs);
                     break;
                 //处理聊天信息
                 case "2":
@@ -64,7 +64,7 @@ namespace Server.Processes
                     break;
                 //处理英雄相关的信息
                 case "3":
-                    DealGameData3(dataCenter, strs);
+                    DealGameHero(dataCenter, strs);
                     break;
                 //处理回合相关的信息
                 case "4":
@@ -76,13 +76,14 @@ namespace Server.Processes
                     break;
                 //处理建筑相关的信息
                 case "6":
-                    DealGameData6(dataCenter, strs);
+                    DealGameBuilding(dataCenter, strs);
                     break;
             }
         }
 
+        #region 处理建筑相关的信息
         //处理建筑相关的信息
-        private static void DealGameData6(DataCenter dataCenter, string[] strs)
+        private static void DealGameBuilding(DataCenter dataCenter, string[] strs)
         {
             int rNum = int.Parse(strs[2]);
             int sNum = int.Parse(strs[3]);
@@ -90,31 +91,72 @@ namespace Server.Processes
             {
                 //选择拿牌操作
                 case "1":
-                    string s = "3|6|1|";
-                    if(strs[5]=="1")
-                    {
-                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID+"|");
-                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
-                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
-                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
-                        NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
-                        SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|");
-                    }
-                    if (strs[5] == "2")
-                    {
-                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
-                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
-                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
-                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
-                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
-                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
-                        NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
-                        SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|");
-                    }
+                    DealGameBuilding1(dataCenter,rNum, sNum, strs);
+                    break;
+                //选择建设操作
+                case "2":
+                    DealGameBuilding2(dataCenter, rNum, sNum, strs);
                     break;
             }
 
         }
+
+        //选择建设操作
+        private static void DealGameBuilding2(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            switch(strs[5])
+            {
+                //普通建设
+                case "1":
+                    int id1 = int.Parse(strs[6]);
+                    int index1 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id1);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1]);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index1);
+                    SendToRoom(dataCenter,rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
+                    break;
+                //建设多张牌
+                case "2":
+                    string s2 = "";
+                    for (int i = 6; i < strs.Length; i++)
+                    {
+                        int id2 = int.Parse(strs[6]);
+                        int index2 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id2);
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2]);
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index2);
+                        s2 += (id2 + "|");
+                    }
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + s2);
+                    break;
+            }
+        }
+
+        //选择拿牌操作
+        private static void DealGameBuilding1(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            string s = "3|6|1|";
+            if (strs[5] == "1")
+            {
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
+                SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
+            }
+            if (strs[5] == "2")
+            {
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
+                SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
+            }
+        }
+
+        #endregion
 
         //处理钱相关的信息
         private static void DealGameData5(DataCenter dataCenter, string[] strs)
@@ -127,7 +169,7 @@ namespace Server.Processes
                 case "1":
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 2;
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|"+dataCenter.RoomDataDic[rNum].FinishCount+"|");
                     break;
             }
         }
@@ -139,7 +181,7 @@ namespace Server.Processes
         }
 
         //处理英雄相关的信息
-        private static void DealGameData3(DataCenter dataCenter, string[] strs)
+        private static void DealGameHero(DataCenter dataCenter, string[] strs)
         {
             int rNum = int.Parse(strs[3]);
             int sNum = int.Parse(strs[4]);
@@ -185,7 +227,7 @@ namespace Server.Processes
         }
 
         //处理请求数据信息
-        private static void DealGameData1(DataCenter dataCenter, Socket socket, string[] strs)
+        private static void DealGameInfo(DataCenter dataCenter, Socket socket, string[] strs)
         {
             switch (strs[2])
             {
@@ -228,12 +270,10 @@ namespace Server.Processes
             if (dataCenter.RoomDataDic[rNum].PlayerDataList.Count == 2)
             {
                 SendReverseHeroCase1(dataCenter, rNum);
-                return;
             }
             else
             {
                 SendReverseHeroCase2(dataCenter, rNum);
-                return;
             }
         }
 
@@ -328,6 +368,8 @@ namespace Server.Processes
                 SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                 return;
             }
+            else
+            { SendRoundStart(dataCenter, rNum); }
         }
 
         #endregion
