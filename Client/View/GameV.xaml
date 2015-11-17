@@ -94,6 +94,10 @@
                     Visibility="{Binding IsCenterBuildingPocketVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterBuildingPocketUC>
+                <local:CenterRoundStartUC
+                    Visibility="{Binding IsCenterRoundStartVisible, Converter={StaticResource visibilityConverter}}"
+                    TabIndex="-1">
+                </local:CenterRoundStartUC>
             </Grid>
             <!--控制台-->
             <local:ControlBoardUC Grid.Column="2" 

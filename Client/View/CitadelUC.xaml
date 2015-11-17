@@ -71,15 +71,24 @@
             <StackPanel Grid.Column="2"
                         Grid.Row="1"
                         >
+                <TextBlock Text="昵称"
+                           HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding Nick}"
+                           HorizontalAlignment="Center"
                            Foreground="White"
-                           FontSize="30"/>
+                           FontSize="20"/>
+                <TextBlock Text="座号"
+                           HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding SeatNum}"
+                           HorizontalAlignment="Center"
                            Foreground="White"
-                           FontSize="30"/>
+                           FontSize="20"/>
+                <TextBlock Text="金钱"
+                           HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding Money}"
+                           HorizontalAlignment="Center"
                            Foreground="White"
-                           FontSize="30"/>
+                           FontSize="20"/>
             </StackPanel>
         </Grid>
     </Grid>

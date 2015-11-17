@@ -66,7 +66,76 @@ namespace Server.Processes
                 case "3":
                     DealGameData3(dataCenter, strs);
                     break;
+                //处理回合相关的信息
+                case "4":
+                    DealGameData4(dataCenter, strs);
+                    break;
+                //处理钱相关的信息
+                case "5":
+                    DealGameData5(dataCenter, strs);
+                    break;
+                //处理建筑相关的信息
+                case "6":
+                    DealGameData6(dataCenter, strs);
+                    break;
             }
+        }
+
+        //处理建筑相关的信息
+        private static void DealGameData6(DataCenter dataCenter, string[] strs)
+        {
+            int rNum = int.Parse(strs[2]);
+            int sNum = int.Parse(strs[3]);
+            switch(strs[4])
+            {
+                //选择拿牌操作
+                case "1":
+                    string s = "3|6|1|";
+                    if(strs[5]=="1")
+                    {
+                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID+"|");
+                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                        NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
+                        SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|");
+                    }
+                    if (strs[5] == "1")
+                    {
+                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                        s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                        dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+                        NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
+                        SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|");
+                    }
+                    break;
+            }
+
+        }
+
+        //处理钱相关的信息
+        private static void DealGameData5(DataCenter dataCenter, string[] strs)
+        {
+            int rNum = int.Parse(strs[2]);
+            int sNum = int.Parse(strs[3]);
+            switch(strs[4])
+            {
+                //选择拿钱
+                case "1":
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 2;
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|");
+                    break;
+            }
+        }
+
+        //处理回合相关的信息
+        private static void DealGameData4(DataCenter dataCenter, string[] strs)
+        {
+            throw new NotImplementedException();
         }
 
         //处理英雄相关的信息

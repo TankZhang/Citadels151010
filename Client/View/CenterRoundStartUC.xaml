@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="Client.View.CenterRoundStartUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Client.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="1280">
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="240*"/>
+                <RowDefinition Height="30*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        >
+                <Button Width="120"
+                        Content="拿钱"
+                        FontSize="40"
+                        Background="Transparent"
+                        Command="{Binding SelectMoneyCmd}"
+                        Margin="5">
+
+                </Button>
+                <Button Width="120"
+                        Content="拿牌"
+                        FontSize="40"
+                        Background="Transparent"
+                        Command="{Binding SelectBuildingCmd}"
+                        Margin="5">
+
+                </Button>
+            </StackPanel>
+        </Grid>   
+    </Grid>
+</UserControl>
