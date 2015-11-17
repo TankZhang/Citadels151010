@@ -100,7 +100,7 @@ namespace Server.Processes
                         NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
                         SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|");
                     }
-                    if (strs[5] == "1")
+                    if (strs[5] == "2")
                     {
                         s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
                         dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);

@@ -362,7 +362,7 @@ namespace Client.ViewModel
             //测试
             BattleLog += ("C2S：" + s + "*\n");
 
-            //App.NetCtrl.Send(s);
+            App.NetCtrl.Send(s);
         }
 
         //接收消息的委托
@@ -464,6 +464,7 @@ namespace Client.ViewModel
                 { Step = 7; }
                 if (!IsStepFinished[10])
                 { Step = 10; }
+                CenterBuildings.Clear();
                 for (int i = 3; i < strs.Length; i++)
                 {
                     CenterBuildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
@@ -477,6 +478,7 @@ namespace Client.ViewModel
                 { Step = 13; }
                 if (!IsStepFinished[15])
                 { Step = 15; }
+                CenterBuildings.Clear();
                 for (int i = 3; i < strs.Length; i++)
                 {
                     CenterBuildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
@@ -1305,7 +1307,7 @@ namespace Client.ViewModel
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
-            //ThReceive.Start(App.NetCtrl.SocketClient);
+            ThReceive.Start(App.NetCtrl.SocketClient);
             CardRes = new CardRes();
             CenterBuildings = new ObservableCollection<Building>();
             CenterHeros = new ObservableCollection<Hero>();
