@@ -68,7 +68,7 @@ namespace Server.Processes
                     break;
                 //处理回合相关的信息
                 case "4":
-                    DealGameData4(dataCenter, strs);
+                    DealGameRound(dataCenter, strs);
                     break;
                 //处理钱相关的信息
                 case "5":
@@ -97,8 +97,32 @@ namespace Server.Processes
                 case "2":
                     DealGameBuilding2(dataCenter, rNum, sNum, strs);
                     break;
+                //开局拿的建筑牌
+                case "3":
+                    DealGameBuilding3(dataCenter, rNum, sNum, strs);
+                    break;
             }
 
+        }
+
+        //开局拿的建筑牌,将tableB中的对应牌放入pocketB并且将tableB剩余牌放回backB
+        private static void DealGameBuilding3(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            int id;
+            int index;
+            for (int i = 5; i < strs.Length; i++)
+            {
+                id = int.Parse(strs[i]);
+                index = dataCenter.RoomDataDic[rNum].TableB.FindIndex(s => s.ID == id);
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.RoomDataDic[rNum].TableB[index]);
+                dataCenter.RoomDataDic[rNum].TableB.RemoveAt(index);
+            }
+            for (int i = 0; i < dataCenter.RoomDataDic[rNum].TableB.Count; i++)
+            {
+                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.RoomDataDic[rNum].TableB[0]);
+                dataCenter.RoomDataDic[rNum].TableB.RemoveAt(0);
+            }
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|" + "5|3|" + (strs.Length - 5) + "|");
         }
 
         //选择建设操作
@@ -111,20 +135,26 @@ namespace Server.Processes
                     int id1 = int.Parse(strs[6]);
                     int index1 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id1);
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1]);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1].Price;
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index1);
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
                     SendToRoom(dataCenter,rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
                     break;
                 //建设多张牌
                 case "2":
                     string s2 = "";
+                    int money2 = 0;
                     for (int i = 6; i < strs.Length; i++)
                     {
                         int id2 = int.Parse(strs[6]);
                         int index2 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id2);
                         dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2]);
+                        money2 += dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2].Price;
                         dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index2);
                         s2 += (id2 + "|");
                     }
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money2;
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + s2);
                     break;
             }
@@ -134,22 +164,29 @@ namespace Server.Processes
         private static void DealGameBuilding1(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
             string s = "3|6|1|";
+            //从两个里面选择
             if (strs[5] == "1")
             {
                 s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].TableB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
                 s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].TableB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
                 NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
                 SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
             }
+            //从三个里面选择
             if (strs[5] == "2")
             {
                 s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].TableB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
                 s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].TableB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
                 s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                dataCenter.RoomDataDic[rNum].TableB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
                 NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
                 SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
@@ -175,9 +212,20 @@ namespace Server.Processes
         }
 
         //处理回合相关的信息
-        private static void DealGameData4(DataCenter dataCenter, string[] strs)
+        private static void DealGameRound(DataCenter dataCenter, string[] strs)
         {
-            throw new NotImplementedException();
+            int rNum = int.Parse(strs[2]);
+            int sNum = int.Parse(strs[3]);
+            switch(strs[4])
+            {
+                //回合结束，群发战报，然后通知下家开始新的回合
+                case "1":
+                    SendToRoom(dataCenter, rNum, "3|2|1|"+sNum+"|2|2|"+dataCenter.RoomDataDic[rNum].FinishCount+"|");
+                    SendRoundStart(dataCenter, rNum);
+                    break;
+
+            }
+
         }
 
         //处理英雄相关的信息

@@ -58,6 +58,11 @@
                     Command="{Binding LaboratoryCmd}"
                     Margin="3"
                     Background="Transparent"/>
+            <Button Content="结束回合"
+                    Visibility="{Binding IsRoundOver,Converter={StaticResource collapsedCOnverter}}"
+                    Command="{Binding RoundOverCmd}"
+                    Margin="3"
+                    Background="Transparent"/>
         </StackPanel>
     </Grid>
 </UserControl>
