@@ -838,7 +838,6 @@ namespace Client.ViewModel
                     if (strs[6] == "2")
                     {
                         s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "建筑了";
-                        GamePlayerList[int.Parse(strs[3]) - 1].Buildings.Add(CardRes.Buildings[int.Parse(strs[8])]);
                         for (int i = 8; i < strs.Length; i++)
                         {
                             s += (CardRes.Buildings[int.Parse(strs[i])].Name + "、");
@@ -904,27 +903,15 @@ namespace Client.ViewModel
             string s = "";
             int price = 0;
             int num = 0;
-            IEnumerable a = (IEnumerable)o;
-
-            CenterBuildings.Clear();
-            IEnumerable<Building> bList=a.Cast<Building>();
-
-            foreach (Building b in bList)
+            IEnumerable a = (IEnumerable)o;            
+            
+            foreach (var item in a)
             {
+                Building b = item as Building;
                 s += (b.Id + "|");
                 price += b.Price;
                 num++;
-                PocketBuildings.Remove(b);
             }
-
-            //foreach (var item in a)
-            //{
-            //    Building b = item as Building;
-            //    s += (b.Id + "|");
-            //    price += b.Price;
-            //    num++;
-            //    PocketBuildings.Remove(b);
-            //}
             switch (Step)
             {
                 //建筑师建筑牌，判断数量，然后判断经济
@@ -933,6 +920,10 @@ namespace Client.ViewModel
                     {
                         if (price <= GamePlayerList[SNum - 1].Money)
                         {
+                            foreach (var item in a)
+                            {
+                                PocketBuildings.Remove((Building)item);
+                            }
                             Send("3|6|" + RNum + "|" + SNum + "|" + "2|2|" + s);
                         }
                         else
@@ -946,6 +937,7 @@ namespace Client.ViewModel
                         MessageBox.Show("建筑师最多同时建筑3张建筑！");
                         IsStepFinished[Step] = false;
                     }
+                    RaisePropertyChanged("IsStepFinished");
                     break;
                 //图书馆选择牌
                 case 13:
@@ -1182,10 +1174,14 @@ namespace Client.ViewModel
         public void Build()
         {
             CancelSelect();
+            CenterBuildings.Clear();
+            foreach (var item in PocketBuildings)
+            {
+                CenterBuildings.Add(item);
+            }
             if (!IsStepFinished[8])
             {
                 Step = 8;
-                CenterBuildings = PocketBuildings;
                 Task t8 = new Task(() =>
                 {
                     Thread.Sleep(200);
@@ -1197,7 +1193,6 @@ namespace Client.ViewModel
             if (!IsStepFinished[12])
             {
                 Step = 12;
-                CenterBuildings = PocketBuildings;
                 Task t12 = new Task(() =>
                 {
                     Thread.Sleep(200);
@@ -1580,12 +1575,12 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
             IsCenterRoundStartVisible = false;
-            IsRoundOver = false;
+            IsRoundOver = true;
             ChatText = "";
             ChatLog = "";
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";
             Index = -1;
-            Step = 8;
+            Step = -1;
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,true,true, true,
                 true, true, true, true, true, true, true, true,true,true });
 
@@ -1598,6 +1593,20 @@ namespace Client.ViewModel
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
+            
+            //PocketBuildings.Add(CardRes.Buildings[12]);
+            //PocketBuildings.Add(CardRes.Buildings[14]);
+            //PocketBuildings.Add(CardRes.Buildings[17]);
+            //PocketBuildings.Add(CardRes.Buildings[19]);
+
+            //CenterBuildings.Clear();
+
+            //foreach (var item in PocketBuildings)
+            //{
+            //    CenterBuildings.Add(item);
+            //}
+
+            //IsCenterBuildingMultiVisable = true;
 
             //#region 默认卡牌
             //GamePlayerList[0].Nick = "默认1";

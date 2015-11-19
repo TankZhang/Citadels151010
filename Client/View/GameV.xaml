@@ -14,7 +14,7 @@
         <local:VisibilityBindingHelper x:Key="visibilityConverter"/>
     </Window.Resources>
     <Grid>
-        <Grid ShowGridLines="True">
+        <Grid ShowGridLines="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="160*"/>
                 <ColumnDefinition Width="20*"/>

@@ -147,7 +147,7 @@ namespace Server.Processes
                     int money2 = 0;
                     for (int i = 6; i < strs.Length; i++)
                     {
-                        int id2 = int.Parse(strs[6]);
+                        int id2 = int.Parse(strs[i]);
                         int index2 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id2);
                         dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2]);
                         money2 += dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2].Price;
@@ -156,7 +156,7 @@ namespace Server.Processes
                     }
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money2;
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + s2);
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + s2);
                     break;
             }
         }

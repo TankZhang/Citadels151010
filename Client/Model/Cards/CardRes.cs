@@ -39,7 +39,7 @@ namespace Client.Model.Cards
             Add(Buildings, FunctionType.warlord, "战场", 3, @"\Res\Cards\militaryBuilding_Battlefield.png", "战场", ref startNum, 3);
             Add(Buildings, FunctionType.warlord, "堡垒", 5, @"\Res\Cards\militaryBuilding_Fortress.png", "堡垒", ref startNum, 2);
             Add(Buildings, FunctionType.warlord, "监狱", 2, @"\Res\Cards\militaryBuilding_Prison.png", "监狱", ref startNum, 3);
-            Add(Buildings, FunctionType.warlord, "瞭望塔", 3, @"\Res\Cards\militaryBuilding_Watchtower.png", "瞭望塔", ref startNum, 3);
+            Add(Buildings, FunctionType.warlord, "瞭望塔", 1, @"\Res\Cards\militaryBuilding_Watchtower.png", "瞭望塔", ref startNum, 3);
             Add(Buildings, FunctionType.noble, "城堡", 4, @"\Res\Cards\nobleBuilding_Castle.png", "城堡", ref startNum, 4);
             Add(Buildings, FunctionType.noble, "皇宫", 5, @"\Res\Cards\nobleBuilding_Palace.png", "皇宫", ref startNum, 3);
             Add(Buildings, FunctionType.noble, "庄园", 3, @"\Res\Cards\nobleBuilding_Manor.png", "庄园", ref startNum, 5);
