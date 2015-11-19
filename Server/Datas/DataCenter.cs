@@ -11,11 +11,13 @@ namespace Server.Datas
         public int RoomNum { get; set; }
         public List<PlayerData> LobbyPlayerList { get; set; }
         public Dictionary<int, RoomData> RoomDataDic { get; set; }
+        public Cards.CardRes CardRes{ get; set; }
         public DataCenter()
         {
             RoomNum = 1;
             LobbyPlayerList = new List<PlayerData>();
             RoomDataDic = new Dictionary<int, RoomData>();
+            CardRes = new Cards.CardRes();
         }
     }
 }

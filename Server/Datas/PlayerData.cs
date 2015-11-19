@@ -151,7 +151,21 @@ namespace Server.Datas
             {
                 _isKing = value;
             }
-        }      
+        }
+
+        bool _isBishop;
+        public bool IsBishop
+        {
+            get
+            {
+                return _isBishop;
+            }
+
+            set
+            {
+                _isBishop = value;
+            }
+        }
 
         int _stoledNum;
         public int StoledNum
@@ -279,6 +293,7 @@ namespace Server.Datas
             KilledNum = -1;
             IsFirst = false;
             IsSecond = false;
+            IsBishop = false;
             Money = -1;
             Score = -1;
             Roles = new List<Hero>();

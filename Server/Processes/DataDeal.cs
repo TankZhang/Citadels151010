@@ -1,4 +1,5 @@
-﻿using Server.Datas;
+﻿using Server.Cards;
+using Server.Datas;
 using Server.Net;
 using Server.SQL;
 using System;
@@ -87,11 +88,11 @@ namespace Server.Processes
         {
             int rNum = int.Parse(strs[2]);
             int sNum = int.Parse(strs[3]);
-            switch(strs[4])
+            switch (strs[4])
             {
                 //选择拿牌操作
                 case "1":
-                    DealGameBuilding1(dataCenter,rNum, sNum, strs);
+                    DealGameBuilding1(dataCenter, rNum, sNum, strs);
                     break;
                 //选择建设操作
                 case "2":
@@ -128,7 +129,7 @@ namespace Server.Processes
         //选择建设操作
         private static void DealGameBuilding2(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
-            switch(strs[5])
+            switch (strs[5])
             {
                 //普通建设
                 case "1":
@@ -138,7 +139,7 @@ namespace Server.Processes
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1].Price;
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index1);
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
-                    SendToRoom(dataCenter,rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
                     break;
                 //建设多张牌
                 case "2":
@@ -200,13 +201,13 @@ namespace Server.Processes
         {
             int rNum = int.Parse(strs[2]);
             int sNum = int.Parse(strs[3]);
-            switch(strs[4])
+            switch (strs[4])
             {
                 //选择拿钱
                 case "1":
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 2;
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|3|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|"+dataCenter.RoomDataDic[rNum].FinishCount+"|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     break;
             }
         }
@@ -216,11 +217,11 @@ namespace Server.Processes
         {
             int rNum = int.Parse(strs[2]);
             int sNum = int.Parse(strs[3]);
-            switch(strs[4])
+            switch (strs[4])
             {
                 //回合结束，群发战报，然后通知下家开始新的回合
                 case "1":
-                    SendToRoom(dataCenter, rNum, "3|2|1|"+sNum+"|2|2|"+dataCenter.RoomDataDic[rNum].FinishCount+"|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     SendRoundStart(dataCenter, rNum);
                     break;
 
@@ -266,6 +267,8 @@ namespace Server.Processes
             int sNum = int.Parse(strs[4]);
             int id = int.Parse(strs[5]);
             int index = dataCenter.RoomDataDic[rNum].BackH.FindIndex(hero => hero.ID == id);
+            if (id == 5)
+            { dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsBishop = true; }        
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Roles.Add(dataCenter.RoomDataDic[rNum].BackH[index]);
             dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Add(id, sNum);
             dataCenter.RoomDataDic[rNum].BackH.RemoveAt(index);
@@ -295,7 +298,7 @@ namespace Server.Processes
                     }
                     NetCtrl.Send(socket, s);
                     //检查是否每个人都返回信息了，当全部返回信息之后，进行选择角色牌 
-                    if (dataCenter.RoomDataDic[rNum].FinishCount < dataCenter.RoomDataDic[rNum].PlayerDataList.Count-1)
+                    if (dataCenter.RoomDataDic[rNum].FinishCount < dataCenter.RoomDataDic[rNum].PlayerDataList.Count - 1)
                     {
                         dataCenter.RoomDataDic[rNum].FinishCount++;
                     }
@@ -342,7 +345,7 @@ namespace Server.Processes
                     s += (item.ID + "|");
                 }
                 int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing == true);
-                int seatNum = (dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + dataCenter.RoomDataDic[rNum].FinishCount-1 ) % dataCenter.RoomDataDic[rNum].PlayerDataList.Count;
+                int seatNum = (dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + dataCenter.RoomDataDic[rNum].FinishCount - 1) % dataCenter.RoomDataDic[rNum].PlayerDataList.Count;
                 if (seatNum == 0) seatNum = dataCenter.RoomDataDic[rNum].PlayerDataList.Count;
                 NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[seatNum - 1].Socket, s);
                 SendToRoom(dataCenter, rNum, "3|2|1|" + seatNum + "|1|3|");
@@ -367,9 +370,9 @@ namespace Server.Processes
                     s += (item.ID + "|");
                 }
                 int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing == true);
-                int seatNum = (dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + ((dataCenter.RoomDataDic[rNum].FinishCount-1) % 2)) % 2;
+                int seatNum = (dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + ((dataCenter.RoomDataDic[rNum].FinishCount - 1) % 2)) % 2;
                 if (seatNum == 0) seatNum = 2;
-                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[seatNum-1].Socket, s);
+                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[seatNum - 1].Socket, s);
                 SendToRoom(dataCenter, rNum, "3|2|1|" + seatNum + "|1|3|");
                 return;
             }
@@ -378,33 +381,53 @@ namespace Server.Processes
         //回合开始
         private static void SendRoundStart(DataCenter dataCenter, int rNum)
         {
-            if(dataCenter.RoomDataDic[rNum].FinishCount==8)
+            if (dataCenter.RoomDataDic[rNum].FinishCount == 8)
             {
+                //重置playerdata和int，移位王冠，并清空当前Hero2PlayerDic。
+                int kingSeat = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing);
+                foreach (var playerdata in dataCenter.RoomDataDic[rNum].PlayerDataList)
+                {
+                    playerdata.IsKing = false;
+                    playerdata.IsBishop = false;
+                    playerdata.StoledNum = -1;
+                    playerdata.IsStoling = false;
+                    playerdata.KilledNum = -1;
+                }
+                if(dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(4))
+                {
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[dataCenter.RoomDataDic[rNum].Hero2PlayerDic[4] - 1].IsKing = true;
+                }
+                else
+                {
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[(kingSeat + 1) % (dataCenter.RoomDataDic[rNum].PlayerDataList.Count)].IsKing = true;
+                }
+                dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Clear();
+
                 dataCenter.RoomDataDic[rNum].FinishCount = 0;
                 SendPickHero(dataCenter, rNum);
                 return;
             }
             dataCenter.RoomDataDic[rNum].FinishCount++;
             //如果有玩家选了叫到的角色
-            if(dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(dataCenter.RoomDataDic[rNum].FinishCount))
+            if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(dataCenter.RoomDataDic[rNum].FinishCount))
             {
                 int sNum = dataCenter.RoomDataDic[rNum].Hero2PlayerDic[dataCenter.RoomDataDic[rNum].FinishCount];
-                dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Remove(dataCenter.RoomDataDic[rNum].FinishCount);
+                //dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Remove(dataCenter.RoomDataDic[rNum].FinishCount);
                 //如果被偷，后台操作钱之后通知到小偷和被偷者,并更新战报，并将被偷归零
-                if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum-1].StoledNum== dataCenter.RoomDataDic[rNum].FinishCount)
+                if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].StoledNum == dataCenter.RoomDataDic[rNum].FinishCount)
                 {
                     int money = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money;
                     int stoleNum = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(s => s.IsStoling == true) + 1;
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money = 0;
                     dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Money += money;
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|5|2|");
-                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Socket, "3|5|1|"+ dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Money + "|");
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|1|" + stoleNum + "|"+ dataCenter.RoomDataDic[rNum].FinishCount + "|"+money+"|");
+                    NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Socket, "3|5|1|" + dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].Money + "|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|1|" + stoleNum + "|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + money + "|");
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].StoledNum = -1;
                     dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].IsStoling = false;
                 }
                 //如果被杀，通知全体，通知个人，然后将被杀归零,叫到下家开始回合
-                if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum== dataCenter.RoomDataDic[rNum].FinishCount)
+                if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum == dataCenter.RoomDataDic[rNum].FinishCount)
                 {
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|3|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|4|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
@@ -426,7 +449,11 @@ namespace Server.Processes
         //rNum号房间让某人选英雄
         private static void SendPickHero(DataCenter dataCenter, int rNum)
         {
-            if (dataCenter.RoomDataDic[rNum].FinishCount == 0) { dataCenter.RoomDataDic[rNum].BackH.RemoveAt(0); }
+            if (dataCenter.RoomDataDic[rNum].FinishCount == 0)
+            {
+                dataCenter.RoomDataDic[rNum].BackH = CardRes.RandOrderHList(dataCenter.CardRes.OrderHeros);
+                dataCenter.RoomDataDic[rNum].BackH.RemoveAt(0);
+            }
             //当玩家数量为2时，直到finishCount为4时才停止，不是2时直到finishCount为count时候就停止开始游戏。
             if (dataCenter.RoomDataDic[rNum].PlayerDataList.Count == 2)
             {
@@ -470,7 +497,7 @@ namespace Server.Processes
                 int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing == true);
                 int seatNum = (dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + (dataCenter.RoomDataDic[rNum].FinishCount % 2)) % 2;
                 if (seatNum == 0) seatNum = 2;
-                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[seatNum-1].Socket, s);
+                NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[seatNum - 1].Socket, s);
                 SendToRoom(dataCenter, rNum, "3|2|1|" + seatNum + "|1|1|");
                 return;
             }

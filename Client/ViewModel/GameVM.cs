@@ -730,8 +730,7 @@ namespace Client.ViewModel
             {
                 //英雄相关的战报
                 case "1":
-                    string[] ss = { "", "正在选角色", "选择了一个角色", "正在选择盖下的角色", "盖下了一个角色" };
-                    s = ss[int.Parse(strs[5])];
+                    s = DealBattleLog1(strs);
                     break;
                 //回合相关的战报
                 case "2":
@@ -772,19 +771,46 @@ namespace Client.ViewModel
             }
         }
 
+        //英雄相关的战报
+        private string DealBattleLog1(string[] strs)
+        {
+            int seatNum = int.Parse(strs[3]);
+            switch (strs[5])
+            {
+                case "1":
+                    return "正在选择角色";
+                case "2":
+                    if (seatNum != SNum)
+                    { GamePlayerList[seatNum - 1].Roles.Add(CardRes.Heros[0]); }
+                    return "选择了一个角色";
+                case "3":
+                    return "正在选择盖下一个角色";
+                case "4":
+                    return "盖下了一个角色";
+            }
+            return "处理英雄相关的战报时收到了错误的信息！";
+        }
+
         //回合相关的战报
         private string DealBattleLog2(string[] strs)
         {
+            int seatNum = int.Parse(strs[3]);
             string s = "";
             switch (strs[5])
             {
                 //回合开始
                 case "1":
                     s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "的回合开始";
+                    if (seatNum != SNum)
+                    { GamePlayerList[seatNum - 1].Roles[0]= CardRes.Heros[int.Parse(strs[6])]; }
                     break;
                 //回合结束
                 case "2":
                     s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "的回合结束";
+                    if(seatNum==SNum)
+                    { GamePlayerList[seatNum - 1].Roles.Remove(CardRes.Heros[int.Parse(strs[6])]); }
+                    else
+                    { GamePlayerList[seatNum - 1].Roles.RemoveAt(0); }
                     break;
             }
             return s;
@@ -879,14 +905,26 @@ namespace Client.ViewModel
             int price = 0;
             int num = 0;
             IEnumerable a = (IEnumerable)o;
-            foreach (var item in a)
+
+            CenterBuildings.Clear();
+            IEnumerable<Building> bList=a.Cast<Building>();
+
+            foreach (Building b in bList)
             {
-                Building b = item as Building;
                 s += (b.Id + "|");
                 price += b.Price;
                 num++;
                 PocketBuildings.Remove(b);
             }
+
+            //foreach (var item in a)
+            //{
+            //    Building b = item as Building;
+            //    s += (b.Id + "|");
+            //    price += b.Price;
+            //    num++;
+            //    PocketBuildings.Remove(b);
+            //}
             switch (Step)
             {
                 //建筑师建筑牌，判断数量，然后判断经济
@@ -1148,13 +1186,25 @@ namespace Client.ViewModel
             {
                 Step = 8;
                 CenterBuildings = PocketBuildings;
-                IsCenterBuildingVisable = true;
+                Task t8 = new Task(() =>
+                {
+                    Thread.Sleep(200);
+                    IsCenterBuildingVisable = true;
+                });
+                t8.Start();
+                //IsCenterBuildingVisable = true;
             }
             if (!IsStepFinished[12])
             {
                 Step = 12;
                 CenterBuildings = PocketBuildings;
-                IsCenterBuildingMultiVisable = true;
+                Task t12 = new Task(() =>
+                {
+                    Thread.Sleep(200);
+                    IsCenterBuildingMultiVisable = true;
+                });
+                t12.Start();
+                //IsCenterBuildingMultiVisable = true;
             }
         }
 
@@ -1352,6 +1402,7 @@ namespace Client.ViewModel
             {
                 IsStepFinished[i] = true;
             }
+            RaisePropertyChanged("IsStepFinished");
             //向服务器发送结束回合命令
             Send("3|4|" + RNum + "|" + SNum + "|1|");
 
