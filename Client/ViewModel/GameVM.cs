@@ -467,7 +467,19 @@ namespace Client.ViewModel
                 case "1":
                     DealBuilding1(strs);
                     break;
+                case "2":
+                    DealBuilding2(strs);
+                    break;
             }
+        }
+
+        //处理建筑师多拿的牌
+        private void DealBuilding2(string[] strs)
+        {
+            int id = int.Parse(strs[3]);
+            PocketBuildings.Add(CardRes.Buildings[id]);
+            id = int.Parse(strs[4]);
+            PocketBuildings.Add(CardRes.Buildings[id]);
         }
 
         //处理选择拿牌数据
@@ -738,17 +750,7 @@ namespace Client.ViewModel
                     break;
                 //钱相关的战报
                 case "3":
-                    switch (strs[5])
-                    {
-                        //偷成功
-                        case "1":
-                            s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "被" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了" + strs[8] + "个钱！";
-                            break;
-                        //选择拿钱
-                        case "2":
-                            s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "选择了拿钱";
-                            break;
-                    }
+                    s = DealBattleLog3(strs);
                     break;
                 //被杀害
                 case "4":
@@ -771,6 +773,35 @@ namespace Client.ViewModel
             }
         }
 
+        //钱相关的战报
+        private string DealBattleLog3(string[] strs)
+        {
+            string s = "";
+            switch (strs[5])
+            {
+                //偷成功
+                case "1":
+                    s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "被" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了" + strs[8] + "个钱！";
+                    break;
+                //选择拿钱
+                case "2":
+                    s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "选择了拿钱";
+                    break;
+                //通过建筑拿钱
+                case "3":
+                    int money = int.Parse(strs[6]);
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money += money;
+                    s = "通过建筑拿了" + money + "个金币";
+                    break;
+                //作为商人多拿了一个钱
+                case "4":
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money += 1;
+                    s = "作为商人多得了1个金币";
+                    break;
+            }
+            return s;
+        }
+
         //英雄相关的战报
         private string DealBattleLog1(string[] strs)
         {
@@ -787,6 +818,9 @@ namespace Client.ViewModel
                     return "正在选择盖下一个角色";
                 case "4":
                     return "盖下了一个角色";
+                    //杀害一个角色
+                case "5":
+                    return "作为刺客选择杀害"+CardRes.Heros[int.Parse(strs[6])].Name;
             }
             return "处理英雄相关的战报时收到了错误的信息！";
         }
@@ -802,12 +836,12 @@ namespace Client.ViewModel
                 case "1":
                     s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "的回合开始";
                     if (seatNum != SNum)
-                    { GamePlayerList[seatNum - 1].Roles[0]= CardRes.Heros[int.Parse(strs[6])]; }
+                    { GamePlayerList[seatNum - 1].Roles[0] = CardRes.Heros[int.Parse(strs[6])]; }
                     break;
                 //回合结束
                 case "2":
                     s = "作为" + CardRes.Heros[int.Parse(strs[6])].Name + "的回合结束";
-                    if(seatNum==SNum)
+                    if (seatNum == SNum)
                     { GamePlayerList[seatNum - 1].Roles.Remove(CardRes.Heros[int.Parse(strs[6])]); }
                     else
                     { GamePlayerList[seatNum - 1].Roles.RemoveAt(0); }
@@ -848,6 +882,10 @@ namespace Client.ViewModel
                 //开局选择了建筑
                 case "3":
                     s = "开局选择了" + int.Parse(strs[6]) + "张建筑牌";
+                    break;
+                //作为建筑师多得了两张建筑牌
+                case "4":
+                    s = "作为建筑师多得两张建筑牌";
                     break;
             }
             return s;
@@ -903,8 +941,8 @@ namespace Client.ViewModel
             string s = "";
             int price = 0;
             int num = 0;
-            IEnumerable a = (IEnumerable)o;            
-            
+            IEnumerable a = (IEnumerable)o;
+
             foreach (var item in a)
             {
                 Building b = item as Building;
@@ -989,7 +1027,10 @@ namespace Client.ViewModel
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     Index = -1;
                     break;
+                //刺杀英雄的单选
                 case 3:
+                    IsCenterHeroVisable = false;
+                    Send("3|3|3|" + RNum + "|" + SNum + "|"+ CenterHeros[Index].Id + "|");
                     break;
                 case 4:
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
@@ -1532,7 +1573,6 @@ namespace Client.ViewModel
         }
         #endregion
 
-
         //构造函数
         public GameVM(int num, int rNum, int sNum)
         {
@@ -1593,7 +1633,7 @@ namespace Client.ViewModel
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));
-            
+
             //PocketBuildings.Add(CardRes.Buildings[12]);
             //PocketBuildings.Add(CardRes.Buildings[14]);
             //PocketBuildings.Add(CardRes.Buildings[17]);
