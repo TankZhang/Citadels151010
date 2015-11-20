@@ -525,15 +525,15 @@ namespace Client.ViewModel
             {
                 //偷成功
                 case "1":
-                    GamePlayerList[SNum - 1].Money = int.Parse(strs[3]);
+                    //GamePlayerList[SNum - 1].Money = int.Parse(strs[3]);
                     break;
                 //被偷成功
                 case "2":
-                    GamePlayerList[SNum - 1].Money = 0;
+                    //GamePlayerList[SNum - 1].Money = 0;
                     break;
                 //更新钱
                 case "3":
-                    GamePlayerList[SNum - 1].Money = int.Parse(strs[3]);
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money = int.Parse(strs[4]);
                     break;
 
             }
@@ -706,7 +706,18 @@ namespace Client.ViewModel
                             GamePlayerList[SNum - 1].Roles.RemoveAt(i);
                         }
                     }
-                    return;
+                    break;
+                //返回来的可以偷的角色ID
+                case "4":
+                    CancelSelect();
+                    Step = 4;
+                    CenterHeros.Clear();
+                    for (int i = 3; i < strs.Length; i++)
+                    {
+                        CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
+                    }
+                    IsCenterHeroVisable = true;
+                    break;
             }
         }
 
@@ -782,6 +793,8 @@ namespace Client.ViewModel
                 //偷成功
                 case "1":
                     s = "作为" + CardRes.Heros[int.Parse(strs[7])].Name + "被" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "偷了" + strs[8] + "个钱！";
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money = 0;
+                    GamePlayerList[int.Parse(strs[6]) - 1].Money += (int.Parse(strs[8]));
                     break;
                 //选择拿钱
                 case "2":
@@ -818,9 +831,12 @@ namespace Client.ViewModel
                     return "正在选择盖下一个角色";
                 case "4":
                     return "盖下了一个角色";
-                    //杀害一个角色
+                //杀害一个角色
                 case "5":
-                    return "作为刺客选择杀害"+CardRes.Heros[int.Parse(strs[6])].Name;
+                    return "作为刺客选择杀害" + CardRes.Heros[int.Parse(strs[6])].Name;
+                //某个角色被偷了
+                case "6":
+                    return "作为盗贼选择偷" + CardRes.Heros[int.Parse(strs[6])].Name;
             }
             return "处理英雄相关的战报时收到了错误的信息！";
         }
@@ -984,6 +1000,10 @@ namespace Client.ViewModel
                 //魔术师与牌堆交换选择牌
                 case 14:
                     IsStepFinished[5] = true;
+                    foreach (var item in a)
+                    {
+                        PocketBuildings.Remove((Building)item);
+                    }
                     Send("3|6|" + RNum + "|" + SNum + "|" + "4|" + s);
                     break;
                 //天文台和图书馆同时用的时候的选择牌
@@ -1030,11 +1050,12 @@ namespace Client.ViewModel
                 //刺杀英雄的单选
                 case 3:
                     IsCenterHeroVisable = false;
-                    Send("3|3|3|" + RNum + "|" + SNum + "|"+ CenterHeros[Index].Id + "|");
+                    Send("3|3|3|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     break;
+                //偷取英雄的单选
                 case 4:
-                    Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     IsCenterHeroVisable = false;
+                    Send("3|3|5|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     break;
                 case 5:
                     break;
@@ -1190,7 +1211,7 @@ namespace Client.ViewModel
         //控制台显示手牌的操作
         public void ShowHandCards()
         {
-            IsCenterHeroVisable = false;
+            //IsCenterHeroVisable = false;
             IsCenterPlayerVisable = false;
             IsCenterBuildingVisable = false;
             IsCenterBuildingMultiVisable = false;
@@ -1287,14 +1308,16 @@ namespace Client.ViewModel
         //我要偷取函数
         public void Stole()
         {
-            CancelSelect();
-            Step = 4;
-            IsCenterHeroVisable = true;
-            CenterHeros = new ObservableCollection<Hero>();
-            CardRes.Heros.ForEach(x => CenterHeros.Add(x));
-            CenterHeros.RemoveAt(0);
-            CenterHeros.RemoveAt(0);
-            CenterHeros.RemoveAt(0);
+            //先发送我要偷取的信息到服务器。
+            Send("3|3|4|" + RNum + "|" + SNum + "|");
+            //CancelSelect();
+            //Step = 4;
+            //IsCenterHeroVisable = true;
+            //CenterHeros = new ObservableCollection<Hero>();
+            //CardRes.Heros.ForEach(x => CenterHeros.Add(x));
+            //CenterHeros.RemoveAt(0);
+            //CenterHeros.RemoveAt(0);
+            //CenterHeros.RemoveAt(0);
         }
 
         //我要与玩家交换命令
@@ -1341,8 +1364,10 @@ namespace Client.ViewModel
         {
             CancelSelect();
             Step = 14;
+            CenterBuildings.Clear();
+            foreach (Building item in PocketBuildings)
+            { CenterBuildings.Add(item); }
             IsCenterBuildingMultiVisable = true;
-            CenterBuildings = PocketBuildings;
         }
 
         //我要摧毁命令
