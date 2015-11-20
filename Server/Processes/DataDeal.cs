@@ -79,8 +79,41 @@ namespace Server.Processes
                 case "6":
                     DealGameBuilding(dataCenter, strs);
                     break;
+                //处理玩家相关的信息
+                case "7":
+                    DealGamePLayer(dataCenter, strs);
+                    break;
             }
         }
+
+        //处理玩家相关的信息
+        private static void DealGamePLayer(DataCenter dataCenter, string[] strs)
+        {
+            int rNum = int.Parse(strs[2]);
+            int sNum = int.Parse(strs[3]);
+            switch(strs[4])
+            {
+                //魔术师选择与某个玩家交换手牌
+                case "1":
+                    int sNum1 = int.Parse(strs[5]);
+                    List<Building> bTemp = new List<Building>();
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.ForEach(s => bTemp.Add(s));
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Clear();
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum1 - 1].PocketB.ForEach(s => dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(s));
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum1 - 1].PocketB.Clear();
+                    bTemp.ForEach(s => dataCenter.RoomDataDic[rNum].PlayerDataList[sNum1 - 1].PocketB.Add(s));
+                    bTemp = null;
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|6|" + sNum1 + "|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Count + "|");
+                    string s1 = "3|6|4|";
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.ForEach(s => s1+=(s.ID+"|"));
+                    SendToPlayer(dataCenter, rNum, sNum, s1);
+                    s1 = "3|6|4|";
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum1 - 1].PocketB.ForEach(s => s1 += (s.ID + "|"));
+                    SendToPlayer(dataCenter, rNum, sNum1, s1);
+                    break;
+            }
+        }
+
 
         #region 处理建筑相关的信息
         //处理建筑相关的信息
@@ -113,9 +146,12 @@ namespace Server.Processes
         //魔术师与牌堆交换的牌，将牌放入到牌堆中，然后牌堆中取出相应的牌
         private static void DealGameBuilding4(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
+            int index = -1;
             for (int i = 5; i < strs.Length; i++)
             {
-                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(b => b.ID == int.Parse(strs[i])));
+                index = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(b => b.ID == int.Parse(strs[i]));
+                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index]);
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index);
             }
             string s = "3|6|3|";
             for (int i = 0; i < strs.Length-5; i++)
@@ -666,6 +702,12 @@ namespace Server.Processes
             {
                 NetCtrl.Send(item.Socket, str);
             }
+        }
+
+        //给特定的玩家发送数据
+        private static void SendToPlayer(DataCenter dataCenter, int rNum, int sNum, string s)
+        {
+            NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
         }
         #endregion
 

@@ -464,12 +464,41 @@ namespace Client.ViewModel
         {
             switch (strs[2])
             {
+                //选择拿的建筑牌
                 case "1":
                     DealBuilding1(strs);
                     break;
+                //建筑师多拿的两张建筑牌
                 case "2":
                     DealBuilding2(strs);
                     break;
+                //魔术师与牌堆交换得到的牌
+                case "3":
+                    DealBuilding3(strs);
+                    break;
+                //更新当前的手牌
+                case "4":
+                    DealBuilding4(strs);
+                    break;
+            }
+        }
+
+        //收到更新当前手牌的数据
+        private void DealBuilding4(string[] strs)
+        {
+            PocketBuildings.Clear();
+            for (int i = 3; i < strs.Length; i++)
+            {
+                PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
+            }
+        }
+
+        //魔术师与牌堆交换得到的牌
+        private void DealBuilding3(string[] strs)
+        {
+            for (int i = 3; i < strs.Length; i++)
+            {
+                PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
             }
         }
 
@@ -903,6 +932,14 @@ namespace Client.ViewModel
                 case "4":
                     s = "作为建筑师多得两张建筑牌";
                     break;
+                //作为魔术师与牌堆交换了n张牌
+                case "5":
+                    s = "作为魔术师与牌堆交换了" + int.Parse(strs[6]) + "张牌！";
+                    break;
+                //魔术师与玩家进行了交换
+                case "6":
+                    s="作为魔术师与"+GamePlayerList[int.Parse(strs[6])-1].Nick+"交换牌，得到了" +int.Parse(strs[7])+ "张牌";
+                    break;
             }
             return s;
         }
@@ -1057,7 +1094,10 @@ namespace Client.ViewModel
                     IsCenterHeroVisable = false;
                     Send("3|3|5|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     break;
+                //魔术师与玩家换牌
                 case 5:
+                    IsCenterPlayerVisable = false;
+                    Send("3|7|" + RNum + "|" + SNum + "|1|" + CenterPlayer[Index].SeatNum + "|");
                     break;
                 case 6:
                     Console.WriteLine("您选择的玩家为" + CenterPlayer[Index].Nick);
@@ -1340,8 +1380,8 @@ namespace Client.ViewModel
             CancelSelect();
             Step = 5;
             IsCenterPlayerVisable = true;
-            CenterPlayer = new ObservableCollection<GamePlayer>();
-            GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
+            CenterPlayer.Clear();
+            GamePlayerList.ToList().ForEach(x => CenterPlayer.Add(x));
             CenterPlayer.RemoveAt(SNum - 1);
         }
 
