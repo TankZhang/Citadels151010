@@ -562,6 +562,7 @@ namespace Server.Processes
             //如果是最后一个结束，重置playerdata和int，移位王冠，并清空当前Hero2PlayerDic。
             if (dataCenter.RoomDataDic[rNum].FinishCount == 8)
             {
+                SendToRoom(dataCenter, rNum, "3|4|2|");
                 int kingSeat = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing);
                 foreach (var playerdata in dataCenter.RoomDataDic[rNum].PlayerDataList)
                 {
@@ -590,7 +591,11 @@ namespace Server.Processes
             if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(dataCenter.RoomDataDic[rNum].FinishCount))
             {
                 int sNum = dataCenter.RoomDataDic[rNum].Hero2PlayerDic[dataCenter.RoomDataDic[rNum].FinishCount];
-                //dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Remove(dataCenter.RoomDataDic[rNum].FinishCount);
+
+                //如果是主教，发送主教的标签
+                if(dataCenter.RoomDataDic[rNum].FinishCount==5)
+                { SendToRoom(dataCenter, rNum, "3|3|5|"+sNum+"|"); }
+
                 //如果被偷，后台操作钱之后通知到小偷和被偷者,并更新战报，并将被偷归零
                 if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].StoledNum == dataCenter.RoomDataDic[rNum].FinishCount)
                 {
@@ -639,6 +644,8 @@ namespace Server.Processes
                         }
                         break;
                     case 6:
+                        SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|4|");
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 1;
                         foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB)
                         {
                             if (item.Type == FunctionType.commercial)
@@ -663,12 +670,7 @@ namespace Server.Processes
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|3|" + moneyBuilding + "|");
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += moneyBuilding;
                 }
-                //如果是商人，则又要加成并群发。
-                if (dataCenter.RoomDataDic[rNum].FinishCount == 6)
-                {
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|4|");
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 1;
-                }
+                
                 //如果是建筑师，则多发两张手牌并群发战报与单发卡牌信息
                 if (dataCenter.RoomDataDic[rNum].FinishCount == 7)
                 {

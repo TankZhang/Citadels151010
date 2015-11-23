@@ -70,6 +70,21 @@ namespace Client.Model.Datas
             }
         }
 
+        bool _isBishop;
+        public bool IsBishop
+        {
+            get
+            {
+                return _isBishop;
+            }
+
+            set
+            {
+                _isBishop = value;
+                RaisePropertyChanged("IsBishop");
+            }
+        }
+
         ObservableCollection<Building> _buildings;
         public ObservableCollection<Building> Buildings
         {
@@ -100,12 +115,14 @@ namespace Client.Model.Datas
             }
         }
 
+
         public GamePlayer(int seatNum,string nick,int exp,int money)
         {
             SeatNum = seatNum;
             Nick = nick;
             Exp = exp;
             Money = money;
+            IsBishop = false;
             Buildings = new ObservableCollection<Building>();
             Roles = new ObservableCollection<Hero>();
         }

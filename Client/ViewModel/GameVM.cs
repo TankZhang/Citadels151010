@@ -579,6 +579,19 @@ namespace Client.ViewModel
                 case "1":
                     DealRound1(strs);
                     break;
+                //一轮结束
+                case "2":
+                    DealRound2(strs);
+                    break;
+            }
+        }
+
+        //处理一轮结束的信息
+        private void DealRound2(string[] strs)
+        {
+            foreach (var item in GamePlayerList)
+            {
+                item.IsBishop = false;
             }
         }
 
@@ -746,6 +759,10 @@ namespace Client.ViewModel
                         CenterHeros.Add(CardRes.Heros[int.Parse(strs[i])]);
                     }
                     IsCenterHeroVisable = true;
+                    break;
+                    //主教标签提示信息
+                case "5":
+                    GamePlayerList[int.Parse(strs[3]) - 1].IsBishop = true;
                     break;
             }
         }
@@ -1430,9 +1447,12 @@ namespace Client.ViewModel
             CancelSelect();
             Step = 6;
             IsCenterPlayerVisable = true;
-            CenterPlayer = new ObservableCollection<GamePlayer>();
-            GamePlayerList.ToList<GamePlayer>().ForEach(x => CenterPlayer.Add(x));
-            CenterPlayer.RemoveAt(SNum - 1);
+            CenterPlayer.Clear();
+            foreach (GamePlayer item in GamePlayerList)
+            {
+                if((item.SeatNum!=SNum)&&(!item.IsBishop))
+                { CenterPlayer.Add(item); }
+            }
         }
 
         //发动铁匠铺命令
