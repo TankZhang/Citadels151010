@@ -143,8 +143,27 @@ namespace Server.Processes
                 case "5":
                     DealGameBuilding5(dataCenter, rNum, sNum, strs);
                     break;
+                //发动铁匠铺
+                case "6":
+                    DealGameBuilding6(dataCenter,rNum,sNum,strs);
+                    break;
             }
 
+        }
+
+        //发动铁匠铺时候的反应
+        private static void DealGameBuilding6(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= 2;
+            string s = "3|6|5|";
+            for (int i = 0; i < 3; i++)
+            {
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID+"|");
+                dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
+            }
+            SendToPlayer(dataCenter, rNum, sNum, s);
+            SendToRoom(dataCenter, rNum, "3|2|1|"+sNum+"|5|8|");
         }
 
         //军阀摧毁某个玩家的某张牌,减掉应该减的钱和牌，并群发战报

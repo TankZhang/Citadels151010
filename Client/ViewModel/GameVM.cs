@@ -484,6 +484,19 @@ namespace Client.ViewModel
                 case "4":
                     DealBuilding4(strs);
                     break;
+                //手牌中加入
+                case "5":
+                    DealBuilding5(strs);
+                    break;
+            }
+        }
+
+        //处理手牌中加入
+        private void DealBuilding5(string[] strs)
+        {
+            for (int i = 3; i < strs.Length; i++)
+            {
+                PocketBuildings.Add(CardRes.Buildings[int.Parse(strs[i])]);
             }
         }
 
@@ -969,7 +982,12 @@ namespace Client.ViewModel
                     int logmoney = int.Parse(strs[8]);
                     GamePlayerList[logSNum - 1].Money -= logmoney;
                     GamePlayerList[logTargetSNum - 1].Buildings.Remove(CardRes.Buildings[logTargetID]);
-                    s = "作为军阀花" + logmoney + "个金币摧毁了" + GamePlayerList[logTargetSNum - 1].Nick + "的" + CardRes.Buildings[logTargetID].Name+"!";
+                    s = "作为军阀花" + logmoney + "个金币摧毁了" + GamePlayerList[logTargetSNum - 1].Nick + "的" + CardRes.Buildings[logTargetID].Name + "!";
+                    break;
+                //用铁匠铺得到了三张手牌
+                case "8":
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money -= 2;
+                    s = "动用了铁匠铺得到了三张手牌";
                     break;
             }
             return s;
@@ -1134,14 +1152,14 @@ namespace Client.ViewModel
                 case 6:
                     IsCenterPlayerVisable = false;
                     CenterBuildings.Clear();
-                    bool flag = false ;
+                    bool flag = false;
                     for (int i = 0; i < CenterPlayer[Index].Buildings.Count; i++)
                     {
                         //如果有城墙，则更改标志位
-                        if(CenterPlayer[Index].Buildings[i].Id == 55)
+                        if (CenterPlayer[Index].Buildings[i].Id == 55)
                         { flag = true; }
                         //要塞则不加入，因为不能被摧毁
-                        if(CenterPlayer[Index].Buildings[i].Id==63)
+                        if (CenterPlayer[Index].Buildings[i].Id == 63)
                         { continue; }
                         CenterBuildings.Add(CenterPlayer[Index].Buildings[i]);
                     }
@@ -1179,13 +1197,13 @@ namespace Client.ViewModel
                     Index = -1;
                     RaisePropertyChanged("IsStepFinished");
                     break;
-                    //军阀选择玩家的牌去摧毁
+                //军阀选择玩家的牌去摧毁
                 case 9:
                     IsCenterBuildingVisable = false;
-                    if(IsWall)
+                    if (IsWall)
                     {
-                        if(CenterBuildings[Index].Price <= GamePlayerList[SNum - 1].Money)
-                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum+"|"+CenterBuildings[Index].Id + "|"+ CenterBuildings[Index].Price+"|"); }
+                        if (CenterBuildings[Index].Price <= GamePlayerList[SNum - 1].Money)
+                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum + "|" + CenterBuildings[Index].Id + "|" + CenterBuildings[Index].Price + "|"); }
                         else
                         {
                             IsStepFinished[6] = false;
@@ -1195,8 +1213,8 @@ namespace Client.ViewModel
                     }
                     else
                     {
-                        if ((CenterBuildings[Index].Price-1) <= GamePlayerList[SNum - 1].Money)
-                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum + "|" + CenterBuildings[Index].Id + "|" + (CenterBuildings[Index].Price-1) + "|"); }
+                        if ((CenterBuildings[Index].Price - 1) <= GamePlayerList[SNum - 1].Money)
+                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum + "|" + CenterBuildings[Index].Id + "|" + (CenterBuildings[Index].Price - 1) + "|"); }
                         else
                         {
                             IsStepFinished[6] = false;
@@ -1544,8 +1562,13 @@ namespace Client.ViewModel
         //发动铁匠铺函数
         public void Blacksmith()
         {
-            IsBlacksmithExist = false;
-            Console.WriteLine("你发动了铁匠铺");
+            if (GamePlayerList[SNum - 1].Money > 1)
+            {
+                IsBlacksmithExist = false;
+                Send("3|6|" + RNum + "|" + SNum + "|6|");
+            }
+            else
+            { MessageBox.Show("您没有足够的金币！"); }
         }
 
         //发动实验室命令
