@@ -20,6 +20,10 @@ namespace Client.ViewModel
         Thread ThReceive;
         public int SNum { get; set; }
         public int RNum { get; set; }
+        //被摧毁的座位号
+        public int DestroyedSNum { get; set; }
+        //被摧毁的玩家有没有城墙
+        public bool IsWall { get; set; }
         public CardRes CardRes { get; set; }
         #region 各种列表ObservableCollection
         //玩家列表
@@ -376,7 +380,7 @@ namespace Client.ViewModel
         public void Send(string s)
         {
             //测试
-            BattleLog += ("C2S：" + s + "*\n");
+            ChatLog += ("C2S：" + s + "*\n");
 
             App.NetCtrl.Send(s);
         }
@@ -425,7 +429,7 @@ namespace Client.ViewModel
         private void DealReceive(string item)
         {
             //测试
-            BattleLog += ("S2C：" + item + "\n");
+            ChatLog += ("S2C：" + item + "\n");
 
             string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "3") { return; }
@@ -760,7 +764,7 @@ namespace Client.ViewModel
                     }
                     IsCenterHeroVisable = true;
                     break;
-                    //主教标签提示信息
+                //主教标签提示信息
                 case "5":
                     GamePlayerList[int.Parse(strs[3]) - 1].IsBishop = true;
                     break;
@@ -955,7 +959,17 @@ namespace Client.ViewModel
                     break;
                 //魔术师与玩家进行了交换
                 case "6":
-                    s="作为魔术师与"+GamePlayerList[int.Parse(strs[6])-1].Nick+"交换牌，得到了" +int.Parse(strs[7])+ "张牌";
+                    s = "作为魔术师与" + GamePlayerList[int.Parse(strs[6]) - 1].Nick + "交换牌，得到了" + int.Parse(strs[7]) + "张牌";
+                    break;
+                //军阀摧毁了某个人的某张牌,将钱减掉，并将牌拿掉,并声明
+                case "7":
+                    int logSNum = int.Parse(strs[3]);
+                    int logTargetSNum = int.Parse(strs[6]);
+                    int logTargetID = int.Parse(strs[7]);
+                    int logmoney = int.Parse(strs[8]);
+                    GamePlayerList[logSNum - 1].Money -= logmoney;
+                    GamePlayerList[logTargetSNum - 1].Buildings.Remove(CardRes.Buildings[logTargetID]);
+                    s = "作为军阀花" + logmoney + "个金币摧毁了" + GamePlayerList[logTargetSNum - 1].Nick + "的" + CardRes.Buildings[logTargetID].Name+"!";
                     break;
             }
             return s;
@@ -1116,9 +1130,31 @@ namespace Client.ViewModel
                     IsCenterPlayerVisable = false;
                     Send("3|7|" + RNum + "|" + SNum + "|1|" + CenterPlayer[Index].SeatNum + "|");
                     break;
+                //军阀选择玩家去摧毁
                 case 6:
-                    Console.WriteLine("您选择的玩家为" + CenterPlayer[Index].Nick);
                     IsCenterPlayerVisable = false;
+                    CenterBuildings.Clear();
+                    bool flag = false ;
+                    for (int i = 0; i < CenterPlayer[Index].Buildings.Count; i++)
+                    {
+                        //如果有城墙，则更改标志位
+                        if(CenterPlayer[Index].Buildings[i].Id == 55)
+                        { flag = true; }
+                        //要塞则不加入，因为不能被摧毁
+                        if(CenterPlayer[Index].Buildings[i].Id==63)
+                        { continue; }
+                        CenterBuildings.Add(CenterPlayer[Index].Buildings[i]);
+                    }
+                    IsWall = flag;
+                    Task t = new Task(() =>
+                    {
+                        Step = 9;
+                        Index = -1;
+                        Thread.Sleep(200);
+                        IsCenterBuildingVisable = true;
+                    });
+                    t.Start();
+                    DestroyedSNum = CenterPlayer[Index].SeatNum;
                     break;
                 //普通选择建筑
                 case 7:
@@ -1143,7 +1179,31 @@ namespace Client.ViewModel
                     Index = -1;
                     RaisePropertyChanged("IsStepFinished");
                     break;
+                    //军阀选择玩家的牌去摧毁
                 case 9:
+                    IsCenterBuildingVisable = false;
+                    if(IsWall)
+                    {
+                        if(CenterBuildings[Index].Price <= GamePlayerList[SNum - 1].Money)
+                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum+"|"+CenterBuildings[Index].Id + "|"+ CenterBuildings[Index].Price+"|"); }
+                        else
+                        {
+                            IsStepFinished[6] = false;
+                            IsStepFinished[9] = false;
+                            MessageBox.Show("您没有足够的钱摧毁此建筑");
+                        }
+                    }
+                    else
+                    {
+                        if ((CenterBuildings[Index].Price-1) <= GamePlayerList[SNum - 1].Money)
+                        { Send("3|6|" + RNum + "|" + SNum + "|" + "5|" + DestroyedSNum + "|" + CenterBuildings[Index].Id + "|" + (CenterBuildings[Index].Price-1) + "|"); }
+                        else
+                        {
+                            IsStepFinished[6] = false;
+                            IsStepFinished[9] = false;
+                            MessageBox.Show("您没有足够的钱摧毁此建筑");
+                        }
+                    }
                     break;
                 //天文台选择建筑
                 case 10:
@@ -1181,7 +1241,9 @@ namespace Client.ViewModel
             switch (Step)
             {
                 case 1:
+                    break;
                 case 2:
+                    break;
                 case 3:
                 case 4: IsCenterHeroVisable = false; break;
                 case 5:
@@ -1193,7 +1255,8 @@ namespace Client.ViewModel
                 case 11: IsCenterBuildingVisable = false; break;
                 case 12:
                 case 13:
-                case 14: IsCenterBuildingMultiVisable = false; break;
+                case 14:
+                case 15: IsCenterBuildingMultiVisable = false; break;
                 default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
             IsCenterBuildingPocketVisable = false;
@@ -1446,12 +1509,21 @@ namespace Client.ViewModel
         {
             CancelSelect();
             Step = 6;
-            IsCenterPlayerVisable = true;
             CenterPlayer.Clear();
             foreach (GamePlayer item in GamePlayerList)
             {
-                if((item.SeatNum!=SNum)&&(!item.IsBishop))
+                if ((item.SeatNum != SNum) && (!item.IsBishop))
                 { CenterPlayer.Add(item); }
+            }
+            if (CenterPlayer.Count == 0)
+            {
+                IsStepFinished[6] = true;
+                IsCenterPlayerVisable = false;
+                MessageBox.Show("没有可摧毁的角色，因为对方是主教不可摧毁！");
+            }
+            else
+            {
+                IsCenterPlayerVisable = true;
             }
         }
 
@@ -1701,11 +1773,13 @@ namespace Client.ViewModel
             IsCenterBuildingPocketVisable = false;
             IsCenterRoundStartVisible = false;
             IsRoundOver = true;
+            IsWall = false;
             ChatText = "";
             ChatLog = "";
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";
             Index = -1;
             Step = -1;
+            DestroyedSNum = -1;
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,true,true, true,
                 true, true, true, true, true, true, true, true,true,true });
 

@@ -139,8 +139,23 @@ namespace Server.Processes
                 case "4":
                     DealGameBuilding4(dataCenter, rNum, sNum, strs);
                     break;
+                //军阀摧毁某个玩家的某张牌
+                case "5":
+                    DealGameBuilding5(dataCenter, rNum, sNum, strs);
+                    break;
             }
 
+        }
+
+        //军阀摧毁某个玩家的某张牌,减掉应该减的钱和牌，并群发战报
+        private static void DealGameBuilding5(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            int TargetSnum = int.Parse(strs[5]);
+            int TargetID = int.Parse(strs[6]);
+            int money = int.Parse(strs[7]);
+            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money;
+            dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.Remove(dataCenter.CardRes.Buildings[TargetID - 1]);
+            SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|7|"+TargetSnum+"|"+TargetID+"|"+money+"|");
         }
 
         //魔术师与牌堆交换的牌，将牌放入到牌堆中，然后牌堆中取出相应的牌
@@ -342,8 +357,10 @@ namespace Server.Processes
             string s = "3|3|4|";
             for (int i = 2; i < 8; i++)
             {
-                if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p => p.KilledNum == (i+1)) < 0)
-                    s += ((i+1) + "|");
+                //if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p => p.KilledNum == (i+1)) < 0)
+                //    s += ((i+1) + "|");
+                if((i+1)!= dataCenter.RoomDataDic[rNum].KilledNum)
+                    s+= ((i + 1) + "|");
             }
             NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
         }
@@ -355,7 +372,8 @@ namespace Server.Processes
             int sNum = int.Parse(strs[4]);
             int id = int.Parse(strs[5]);
             SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|" + "1|5|"+id+"|");
-            if(dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(id))
+            dataCenter.RoomDataDic[rNum].KilledNum = id;
+            if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(id))
             {
                 dataCenter.RoomDataDic[rNum].PlayerDataList[dataCenter.RoomDataDic[rNum].Hero2PlayerDic[id] - 1].KilledNum = id;
             }
@@ -564,13 +582,14 @@ namespace Server.Processes
             {
                 SendToRoom(dataCenter, rNum, "3|4|2|");
                 int kingSeat = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(player => player.IsKing);
+                dataCenter.RoomDataDic[rNum].KilledNum = -1;
                 foreach (var playerdata in dataCenter.RoomDataDic[rNum].PlayerDataList)
                 {
                     playerdata.IsKing = false;
                     playerdata.IsBishop = false;
                     playerdata.StoledNum = -1;
                     playerdata.IsStoling = false;
-                    playerdata.KilledNum = -1;
+                    //playerdata.KilledNum = -1;
                 }
                 if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(4))
                 {
@@ -610,11 +629,11 @@ namespace Server.Processes
                     dataCenter.RoomDataDic[rNum].PlayerDataList[stoleNum - 1].IsStoling = false;
                 }
                 //如果被杀，通知全体，通知个人，然后将被杀归零,叫到下家开始回合
-                if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum == dataCenter.RoomDataDic[rNum].FinishCount)
+                if (dataCenter.RoomDataDic[rNum].KilledNum == dataCenter.RoomDataDic[rNum].FinishCount)
                 {
                     NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, "3|3|3|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|4|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum = -1;
+                    //dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].KilledNum = -1;
                     SendRoundStart(dataCenter, rNum);
                     return;
                 }

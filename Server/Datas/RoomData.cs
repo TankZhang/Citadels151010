@@ -17,6 +17,7 @@ namespace Server.Datas
         public Dictionary<int, int> Hero2PlayerDic { set; get; }
         public string Status{set; get;}
         public int FinishCount { get; set; }
+        public int KilledNum { get; set; }
         public RoomData()
         {
             BackB = new List<Building>();
@@ -30,6 +31,7 @@ namespace Server.Datas
             PlayerDataList = new List<PlayerData>();
             Status = "未开始";
             FinishCount = 0;
+            KilledNum = -1;
         }
     }
 }
