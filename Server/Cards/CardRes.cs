@@ -61,7 +61,7 @@ namespace Server.Cards
             Add(OrderBuildings, FunctionType.warlord, "战场", 3, ref startNum, 3);
             Add(OrderBuildings, FunctionType.warlord, "堡垒", 5, ref startNum, 2);
             Add(OrderBuildings, FunctionType.warlord, "监狱", 2, ref startNum, 3);
-            Add(OrderBuildings, FunctionType.warlord, "瞭望塔", 3, ref startNum, 3);
+            Add(OrderBuildings, FunctionType.warlord, "瞭望塔", 1, ref startNum, 3);
             Add(OrderBuildings, FunctionType.noble, "城堡", 4, ref startNum, 4);
             Add(OrderBuildings, FunctionType.noble, "皇宫", 5, ref startNum, 3);
             Add(OrderBuildings, FunctionType.noble, "庄园", 3, ref startNum, 5);

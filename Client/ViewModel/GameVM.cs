@@ -989,6 +989,11 @@ namespace Client.ViewModel
                     GamePlayerList[int.Parse(strs[3]) - 1].Money -= 2;
                     s = "动用了铁匠铺得到了三张手牌";
                     break;
+                //用实验室得到了一个钱
+                case "9":
+                    GamePlayerList[int.Parse(strs[3]) - 1].Money++;
+                    s = "动用实验室得到了一个金币";
+                    break;
             }
             return s;
         }
@@ -1096,6 +1101,26 @@ namespace Client.ViewModel
                 case 15:
                     Send("3|6|" + RNum + "|" + SNum + "|" + "3|" + s);
                     break;
+                    //回合结束时候丢弃手牌，多选处选择后，将IsStepFinished【16】设置为true，关闭显示
+                    //首先判断剩余的牌是否少于4张，
+                    //如果是，则发送丢弃的牌的ID并将手牌中对应的去掉。并调用回合结束。
+                    //如果不是，则将IsStepFinished【16】设置为false，Step为16，显示多选。
+                    case 16:
+                    if(PocketBuildings.Count-num<5)
+                    {
+                        Send("3|6|" + RNum + "|" + SNum + "|8|" + s);
+                        foreach (var item in a)
+                        {
+                            PocketBuildings.Remove((Building)item);
+                        }
+                        RoundOver();
+                    }
+                    else
+                    {
+                        MessageBox.Show("剩余的手牌不得多于4张！");
+                        IsCenterBuildingMultiVisable = true;
+                    }
+                    break;
                 default: break;
             }
         }
@@ -1122,12 +1147,14 @@ namespace Client.ViewModel
             IsStepFinished[Step] = true;
             switch (Step)
             {
+                //选择英雄
                 case 1:
                     GamePlayerList[SNum - 1].Roles.Add(CenterHeros[Index]);
                     IsCenterHeroVisable = false;
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
                     Index = -1;
                     break;
+                //盖下英雄
                 case 2:
                     IsCenterHeroVisable = false;
                     Send("3|3|" + Step + "|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
@@ -1137,16 +1164,19 @@ namespace Client.ViewModel
                 case 3:
                     IsCenterHeroVisable = false;
                     Send("3|3|3|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
+                    Index = -1;
                     break;
                 //偷取英雄的单选
                 case 4:
                     IsCenterHeroVisable = false;
                     Send("3|3|5|" + RNum + "|" + SNum + "|" + CenterHeros[Index].Id + "|");
+                    Index = -1;
                     break;
                 //魔术师与玩家换牌
                 case 5:
                     IsCenterPlayerVisable = false;
                     Send("3|7|" + RNum + "|" + SNum + "|1|" + CenterPlayer[Index].SeatNum + "|");
+                    Index = -1;
                     break;
                 //军阀选择玩家去摧毁
                 case 6:
@@ -1174,11 +1204,18 @@ namespace Client.ViewModel
                     t.Start();
                     DestroyedSNum = CenterPlayer[Index].SeatNum;
                     break;
-                //普通选择建筑
+                //普通选择建筑,将选择的ID和没有选择的ID同时发给服务器
                 case 7:
                     IsCenterBuildingVisable = false;
-                    Send("3|6|" + RNum + "|" + SNum + "|" + "3|" + CenterBuildings[Index].Id + "|");
+                    Send("3|6|" + RNum + "|" + SNum + "|" + "3|1|" + CenterBuildings[Index].Id + "|");
                     PocketBuildings.Add(CenterBuildings[Index]);
+                    string s = "3|6|" + RNum + "|" + SNum + "|" + "3|2|";
+                    for (int i = 0; i < CenterBuildings.Count; i++)
+                    {
+                        if (i == Index) continue;
+                        s += (CenterBuildings[i].Id + "|");
+                    }
+                    Send(s);
                     Index = -1;
                     break;
                 //普通建设,先判断钱够不够，然后操作。
@@ -1222,6 +1259,7 @@ namespace Client.ViewModel
                             MessageBox.Show("您没有足够的钱摧毁此建筑");
                         }
                     }
+                    Index = -1;
                     break;
                 //天文台选择建筑
                 case 10:
@@ -1230,9 +1268,12 @@ namespace Client.ViewModel
                     PocketBuildings.Add(CenterBuildings[Index]);
                     Index = -1;
                     break;
+                //实验室单选手牌时候
                 case 11:
-                    Console.WriteLine("您单选的建筑为" + CenterBuildings[Index].Name);
                     IsCenterBuildingVisable = false;
+                    Send("3|6|" + RNum + "|" + SNum + "|7|" + CenterBuildings[Index].Id + "|");
+                    PocketBuildings.RemoveAt(Index);
+                    Index = -1;
                     break;
                 default: break;
             }
@@ -1275,6 +1316,7 @@ namespace Client.ViewModel
                 case 13:
                 case 14:
                 case 15: IsCenterBuildingMultiVisable = false; break;
+                case 16: IsCenterBuildingMultiVisable = false;break;
                 default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
             IsCenterBuildingPocketVisable = false;
@@ -1589,7 +1631,11 @@ namespace Client.ViewModel
         public void Laboratory()
         {
             CancelSelect();
-            CenterBuildings = PocketBuildings;
+            CenterBuildings.Clear();
+            foreach (var item in PocketBuildings)
+            {
+                CenterBuildings.Add(item);
+            }
             Step = 11;
             IsCenterBuildingVisable = true;
         }
@@ -1611,17 +1657,30 @@ namespace Client.ViewModel
         //结束回合操作,将所有的IsStepFinished归为true；发回服务器结束回合命令
         public void RoundOver()
         {
-            IsRoundOver = true;
-            CancelSelect();
-            //全true，将IsStepFinished
-            for (int i = 0; i < IsStepFinished.Count; i++)
+            if (PocketBuildings.Count < 5)
             {
-                IsStepFinished[i] = true;
+                IsRoundOver = true;
+                CancelSelect();
+                //全true，将IsStepFinished
+                for (int i = 0; i < IsStepFinished.Count; i++)
+                {
+                    IsStepFinished[i] = true;
+                }
+                RaisePropertyChanged("IsStepFinished");
+                //向服务器发送结束回合命令
+                Send("3|4|" + RNum + "|" + SNum + "|1|");
             }
-            RaisePropertyChanged("IsStepFinished");
-            //向服务器发送结束回合命令
-            Send("3|4|" + RNum + "|" + SNum + "|1|");
-
+            else
+            {
+                CenterBuildings.Clear();
+                foreach (var item in PocketBuildings)
+                {
+                    CenterBuildings.Add(item);
+                }
+                Step = 16;
+                IsStepFinished[16] = false;
+                IsCenterBuildingMultiVisable = true;
+            }
         }
 
 
@@ -1804,7 +1863,7 @@ namespace Client.ViewModel
             Step = -1;
             DestroyedSNum = -1;
             IsStepFinished = new ObservableCollection<bool>(new List<bool> { true,true,true,true,true, true,
-                true, true, true, true, true, true, true, true,true,true });
+                true, true, true, true, true, true, true, true,true,true,true });
 
             Send("3|1|1|" + RNum + "|" + SNum + "|");
 
