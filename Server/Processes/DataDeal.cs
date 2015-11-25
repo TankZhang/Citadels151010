@@ -151,16 +151,32 @@ namespace Server.Processes
                 case "7":
                     DealGameBuilding7(dataCenter, rNum, sNum, strs);
                     break;
+                //回合结束时候丢弃的手牌
+                case "8":
+                    DealGameBuilding8(dataCenter, rNum, sNum, strs);
+                    break;
             }
 
+        }
+
+        //回合结束时候丢弃的手牌，将其从某人手牌中拆掉，然后放到牌堆中。
+        private static void DealGameBuilding8(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            int id;
+            for (int i = 5; i < strs.Length; i++)
+            {
+                id = int.Parse(strs[i]);
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s=>s.ID==id);
+                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
+            }
         }
 
         //发动实验室时候，首先将牌拿回到牌堆，然后将对应玩家的手牌拿掉，然后加钱，然后群发战报
         private static void DealGameBuilding7(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
             int id = int.Parse(strs[5]);
-            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Remove(dataCenter.CardRes.Buildings[id - 1]);
-            dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.Buildings[id - 1]);
+            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(b=>b.ID==id);
+            dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money++;
             SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|9|");
         }
@@ -187,20 +203,18 @@ namespace Server.Processes
             int TargetID = int.Parse(strs[6]);
             int money = int.Parse(strs[7]);
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money;
-            dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.Remove(dataCenter.CardRes.Buildings[TargetID - 1]);
-            dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.Buildings[TargetID - 1]);
+            dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.RemoveAll(b=>b.ID==TargetID);
+            dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[TargetID - 1]);
             SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|7|"+TargetSnum+"|"+TargetID+"|"+money+"|");
         }
 
         //魔术师与牌堆交换的牌，将牌放入到牌堆中，然后牌堆中取出相应的牌
         private static void DealGameBuilding4(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
-            int index = -1;
             for (int i = 5; i < strs.Length; i++)
             {
-                index = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(b => b.ID == int.Parse(strs[i]));
-                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index]);
-                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index);
+                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[i])-1]);
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(b => b.ID == int.Parse(strs[i]));
             }
             string s = "3|6|3|";
             for (int i = 0; i < strs.Length-5; i++)
@@ -224,7 +238,7 @@ namespace Server.Processes
                     for (int i = 6; i < strs.Length; i++)
                     {
                         id = int.Parse(strs[i]);
-                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.CardRes.Buildings[id - 1]);
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
                     }
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|" + "5|3|" + (strs.Length - 6) + "|");
                     break;
@@ -233,7 +247,7 @@ namespace Server.Processes
                     for (int i = 6; i < strs.Length; i++)
                     {
                         id = int.Parse(strs[i]);
-                        dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.Buildings[id - 1]);
+                        dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
                     }
                     break;
 
@@ -248,10 +262,9 @@ namespace Server.Processes
                 //普通建设
                 case "1":
                     int id1 = int.Parse(strs[6]);
-                    int index1 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id1);
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1]);
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index1].Price;
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index1);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.CardRes.OrderBuildings[id1 - 1]);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s => s.ID == id1);
+                   dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.CardRes.OrderBuildings[id1 - 1].Price;
                     SendToRoom(dataCenter, rNum, "3|5|3|" +sNum+"|"+ dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
                     break;
@@ -259,13 +272,13 @@ namespace Server.Processes
                 case "2":
                     string s2 = "";
                     int money2 = 0;
+                    int id2 = -1;
                     for (int i = 6; i < strs.Length; i++)
                     {
-                        int id2 = int.Parse(strs[i]);
-                        int index2 = dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.FindIndex(s1 => s1.ID == id2);
-                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2]);
-                        money2 += dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB[index2].Price;
-                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAt(index2);
+                        id2 = int.Parse(strs[i]);
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.CardRes.OrderBuildings[id2 - 1]);
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s => s.ID == id2);
+                        money2 += dataCenter.CardRes.OrderBuildings[id2 - 1].Price;
                         s2 += (id2 + "|");
                     }
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money2;
@@ -645,6 +658,26 @@ namespace Server.Processes
             //如果有玩家选了叫到的角色
             if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(dataCenter.RoomDataDic[rNum].FinishCount))
             {
+                #region 测试
+                string ss;
+                foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
+                {
+                    ss = "3|2|3|";
+                    ss += (item.Nick + ":");
+                    foreach (var pB in item.PocketB)
+                    {
+                        ss += (pB.Name + "-");
+                    }
+                    ss += item.Money;
+                    ss += "\n";
+                    foreach (var tB in item.TableB)
+                    {
+                        ss += (tB.Name + "-");
+                    }
+                    ss += "\n";
+                    SendToRoom(dataCenter, rNum, ss);
+                }
+                #endregion
                 int sNum = dataCenter.RoomDataDic[rNum].Hero2PlayerDic[dataCenter.RoomDataDic[rNum].FinishCount];
 
                 //如果是主教，发送主教的标签

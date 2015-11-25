@@ -229,7 +229,10 @@ CenterBuildingPocketUC.xaml
 	如果不是，则将IsStepFinished【16】设置为false，Step为16，显示多选。
 客户端：
 	军阀摧毁还要优化，有bug
-	
+服务器：
+	修正部分bug。
+客户端：
+	修正部分bug。
 	
 	
 	

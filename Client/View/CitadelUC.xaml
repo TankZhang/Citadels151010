@@ -30,8 +30,8 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150*"/>
-                <ColumnDefinition Width="450"/>
-                <ColumnDefinition Width="120*"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="450*"/>
             </Grid.ColumnDefinitions>
             <!--玩家角色牌-->
             <ListView Height="150"
@@ -54,7 +54,7 @@
             <ListView HorizontalAlignment="Center"
                       Height="150"
                       Grid.Row="1"
-                      Grid.Column="1"
+                      Grid.Column="2"
                       BorderBrush="Transparent"
                       Background="Transparent"
                       ItemsSource="{Binding Buildings}"
@@ -68,7 +68,8 @@
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
             </ListView>
-            <StackPanel Grid.Column="2"
+            <!--玩家信息-->
+            <StackPanel Grid.Column="1"
                         Grid.Row="1"
                         >
                 <TextBlock Text="昵称"

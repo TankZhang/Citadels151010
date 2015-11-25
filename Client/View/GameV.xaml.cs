@@ -32,10 +32,13 @@ namespace Client.View
             {
                 case 2:
                     upCitadel.DataContext = gameVM.GamePlayerList[2 - seatNum];
+                    leftCitadel.Visibility = Visibility.Collapsed;
+                    rightCitadel.Visibility = Visibility.Collapsed;
                     break;
                 case 3:
                     leftCitadel.DataContext = gameVM.GamePlayerList[seatNum % 3];
                     rightCitadel.DataContext = gameVM.GamePlayerList[(seatNum + 1) % 3];
+                    upCitadel.Visibility = Visibility.Collapsed;
                     break;
                 case 4:
                     leftCitadel.DataContext = gameVM.GamePlayerList[seatNum % 4];

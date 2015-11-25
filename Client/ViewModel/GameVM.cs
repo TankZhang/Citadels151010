@@ -380,7 +380,7 @@ namespace Client.ViewModel
         public void Send(string s)
         {
             //测试
-            ChatLog += ("C2S：" + s + "*\n");
+            BattleLog += ("C2S：" + s + "*\n");
 
             App.NetCtrl.Send(s);
         }
@@ -429,7 +429,7 @@ namespace Client.ViewModel
         private void DealReceive(string item)
         {
             //测试
-            ChatLog += ("S2C：" + item + "\n");
+            BattleLog += ("S2C：" + item + "\n");
 
             string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "3") { return; }
@@ -804,6 +804,10 @@ namespace Client.ViewModel
                         ChatLog += (GamePlayerList[int.Parse(strs[3]) - 1].Nick + ":" + strs[4] + "\n");
                     }
                     break;
+                //测试信息
+                case "3":
+                    ChatLog += strs[3];
+                    break;
             }
         }
 
@@ -982,7 +986,7 @@ namespace Client.ViewModel
                     int logmoney = int.Parse(strs[8]);
                     GamePlayerList[logSNum - 1].Money -= logmoney;
                     GamePlayerList[logTargetSNum - 1].Buildings.Remove(CardRes.Buildings[logTargetID]);
-                    s = "作为军阀花" + logmoney + "个金币摧毁了" + GamePlayerList[logTargetSNum - 1].Nick + "的" + CardRes.Buildings[logTargetID].Name + "!";
+                    s = "花" + logmoney + "个金币摧毁了" + GamePlayerList[logTargetSNum - 1].Nick + "的" + CardRes.Buildings[logTargetID].Name + "!";
                     break;
                 //用铁匠铺得到了三张手牌
                 case "8":
@@ -1196,9 +1200,9 @@ namespace Client.ViewModel
                     IsWall = flag;
                     Task t = new Task(() =>
                     {
-                        Step = 9;
-                        Index = -1;
                         Thread.Sleep(200);
+                        Index = -1;
+                        Step = 9;
                         IsCenterBuildingVisable = true;
                     });
                     t.Start();
@@ -1423,6 +1427,7 @@ namespace Client.ViewModel
             }
             if (!IsStepFinished[8])
             {
+                Index = -1;
                 Step = 8;
                 Task t8 = new Task(() =>
                 {
@@ -1434,6 +1439,7 @@ namespace Client.ViewModel
             }
             if (!IsStepFinished[12])
             {
+                Index = -1;
                 Step = 12;
                 Task t12 = new Task(() =>
                 {
@@ -1572,18 +1578,27 @@ namespace Client.ViewModel
             CenterPlayer.Clear();
             foreach (GamePlayer item in GamePlayerList)
             {
-                if ((item.SeatNum != SNum) && (!item.IsBishop))
+                if ((item.Buildings.Count == 1) && (item.Buildings[0].Id == 63))
+                    continue;
+                if ((item.SeatNum != SNum) && (!item.IsBishop)&&(item.Buildings.Count!=0))
                 { CenterPlayer.Add(item); }
             }
             if (CenterPlayer.Count == 0)
             {
                 IsStepFinished[6] = true;
                 IsCenterPlayerVisable = false;
-                MessageBox.Show("没有可摧毁的角色，因为对方是主教不可摧毁！");
+                MessageBox.Show("没有可摧毁的角色!");
             }
             else
             {
-                IsCenterPlayerVisable = true;
+                Task t = new Task(() =>
+                {
+                    Index = -1;
+                    Step = 6;
+                    Thread.Sleep(200);
+                    IsCenterPlayerVisable = true;
+                });
+                t.Start();
             }
         }
 
