@@ -219,6 +219,38 @@ namespace Client.ViewModel
                 RaisePropertyChanged("IsRoundOver");
             }
         }
+
+        //中间控制墓地功能的显示
+        bool _isCenterCemeteryVisible;
+        public bool IsCenterCemeteryVisible
+        {
+            get
+            {
+                return _isCenterCemeteryVisible;
+            }
+
+            set
+            {
+                _isCenterCemeteryVisible = value;
+                RaisePropertyChanged("IsCenterCemeteryVisible");
+            }
+        }
+
+        //中间结束回合可用不可用
+        bool _isRoundOverEnable;
+        public bool IsRoundOverEnable
+        {
+            get
+            {
+                return _isRoundOverEnable;
+            }
+
+            set
+            {
+                _isRoundOverEnable = value;
+                RaisePropertyChanged("IsRoundOverEnable");
+            }
+        }
         #endregion
 
         #region 流程控制相关的Index，Step，IsStepFinished。
@@ -998,6 +1030,14 @@ namespace Client.ViewModel
                     GamePlayerList[int.Parse(strs[3]) - 1].Money++;
                     s = "动用实验室得到了一个金币";
                     break;
+                //墓地的功能
+                case "10":
+                    if (SNum == int.Parse(strs[3]))
+                        IsCenterCemeteryVisible = true;
+                    if (!IsRoundOver)
+                        IsRoundOverEnable = false;
+                    s = "正在选择是否使用墓地";
+                    break;
             }
             return s;
         }
@@ -1374,6 +1414,50 @@ namespace Client.ViewModel
             {
                 Send("3|6|" + RNum + "|" + SNum + "|" + "1|2|");
             }
+        }
+
+        //中间选择墓地的命令
+        ICommand _useCemeteryCmd;
+        public ICommand UseCemeteryCmd
+        {
+            get
+            {
+                return _useCemeteryCmd;
+            }
+
+            set
+            {
+                _useCemeteryCmd = value;
+                RaisePropertyChanged("UseCemeteryCmd");
+            }
+        }
+        //中间使用墓地的操作
+        public void UseCemetery()
+        {
+            Send("3|6|" + RNum + "|" + SNum + "|9|1|");
+            IsCenterCemeteryVisible = false;
+        }
+
+        //中间放弃使用墓地的命令
+        ICommand _giveUpCemeteryCmd;
+        public ICommand GiveUpCemeteryCmd
+        {
+            get
+            {
+                return _giveUpCemeteryCmd;
+            }
+
+            set
+            {
+                _giveUpCemeteryCmd = value;
+                RaisePropertyChanged("GiveUpCemeteryCmd");
+            }
+        }
+        //中间放弃使用墓地的操作
+        public void GiveUpCemetery()
+        {
+            Send("3|6|" + RNum + "|" + SNum + "|9|2|");
+            IsCenterCemeteryVisible = false;
         }
         #endregion
 
@@ -1848,6 +1932,8 @@ namespace Client.ViewModel
             SelectMoneyCmd = new RelayCommand(new Action(SelectMoney));
             SelectBuildingCmd = new RelayCommand(new Action(SelectBuilding));
             RoundOverCmd = new RelayCommand(new Action(RoundOver));
+            UseCemeteryCmd = new RelayCommand(new Action(UseCemetery));
+            GiveUpCemeteryCmd = new RelayCommand(new Action(GiveUpCemetery));
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
@@ -1869,7 +1955,9 @@ namespace Client.ViewModel
             IsCenterPlayerVisable = false;
             IsCenterBuildingPocketVisable = false;
             IsCenterRoundStartVisible = false;
+            IsCenterCemeteryVisible = false;
             IsRoundOver = true;
+            IsRoundOverEnable = true;
             IsWall = false;
             ChatText = "";
             ChatLog = "";

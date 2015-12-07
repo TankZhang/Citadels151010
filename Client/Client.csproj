@@ -97,6 +97,9 @@
     <Compile Include="View\CenterRoundStartUC.xaml.cs">
       <DependentUpon>CenterRoundStartUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CenterUseCemeteryUC.xaml.cs">
+      <DependentUpon>CenterUseCemeteryUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ChatUC.xaml.cs">
       <DependentUpon>ChatUC.xaml</DependentUpon>
     </Compile>
@@ -180,6 +183,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CenterRoundStartUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterUseCemeteryUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

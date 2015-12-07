@@ -62,6 +62,7 @@
                     Visibility="{Binding IsRoundOver,Converter={StaticResource collapsedCOnverter}}"
                     Command="{Binding RoundOverCmd}"
                     Margin="3"
+                    IsEnabled="{Binding IsRoundOverEnable}"
                     Background="Transparent"/>
         </StackPanel>
     </Grid>

@@ -78,28 +78,39 @@
                     Visibility="{Binding IsCenterHeroVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterHeroUC>
+                <!--中间玩家显示-->
                 <local:CenterPlayerUC 
                     Visibility="{Binding IsCenterPlayerVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterPlayerUC>
+                <!--中间建筑显示-->
                 <local:CenterBuildingUC 
                     Visibility="{Binding IsCenterBuildingVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterBuildingUC>
+                <!--中间建筑多选显示-->
                 <local:CenterBuildingMultiUC 
                     Visibility="{Binding IsCenterBuildingMultiVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterBuildingMultiUC>
+                <!--中间手牌显示-->
                 <local:CenterBuildingPocketUC 
                     Panel.ZIndex="1"
                     Visibility="{Binding IsCenterBuildingPocketVisable, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterBuildingPocketUC>
+                <!--中间游戏开局显示-->
                 <local:CenterRoundStartUC
                     Panel.ZIndex="0"
                     Visibility="{Binding IsCenterRoundStartVisible, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterRoundStartUC>
+                <!--中间墓地选择显示-->
+                <local:CenterUseCemeteryUC
+                    Panel.ZIndex="0"
+                    Visibility="{Binding IsCenterCemeteryVisible, Converter={StaticResource visibilityConverter}}"
+                    TabIndex="-1">
+                </local:CenterUseCemeteryUC>
             </Grid>
             <!--控制台-->
             <local:ControlBoardUC Grid.Column="2" 

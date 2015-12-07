@@ -206,6 +206,12 @@ namespace Server.Processes
             dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.RemoveAll(b=>b.ID==TargetID);
             dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[TargetID - 1]);
             SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|7|"+TargetSnum+"|"+TargetID+"|"+money+"|");
+            //检查是否有人持有墓地并且钱的数目大于1并且不是军阀的。
+            int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(playerData => ((playerData.Money >= 1) && (playerData.PocketB.Exists(b => b.ID == 65))&&(playerData.SNum!=sNum)));
+            if(index>=0)
+            {
+                SendToRoom(dataCenter, rNum, "3|1|1|" + dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + "|5|10|1|");
+            }
         }
 
         //魔术师与牌堆交换的牌，将牌放入到牌堆中，然后牌堆中取出相应的牌
