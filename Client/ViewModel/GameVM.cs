@@ -1032,11 +1032,33 @@ namespace Client.ViewModel
                     break;
                 //墓地的功能
                 case "10":
-                    if (SNum == int.Parse(strs[3]))
-                        IsCenterCemeteryVisible = true;
-                    if (!IsRoundOver)
-                        IsRoundOverEnable = false;
-                    s = "正在选择是否使用墓地";
+                    switch (strs[6])
+                    {
+                        //某人正在选择使用墓地
+                        case "1":
+                            if (SNum == int.Parse(strs[3]))
+                                IsCenterCemeteryVisible = true;
+                            if (!IsRoundOver)
+                                IsRoundOverEnable = false;
+                            s = "正在选择是否使用墓地";
+                            break;
+                        //某人选择了使用墓地
+                        case "2":
+                            GamePlayerList[int.Parse(strs[3]) - 1].Money -= 1;
+                            int buildID = int.Parse(strs[7]);
+                            if (SNum == int.Parse(strs[3]))
+                                PocketBuildings.Add(CardRes.Buildings[buildID]);
+                            if (!IsRoundOverEnable)
+                                IsRoundOverEnable = true;
+                            s = "花费1个金币通过墓地买下了" + CardRes.Buildings[buildID].Name;
+                            break;
+                        //某人选择了放弃墓地的使用
+                        case "3":
+                            if (!IsRoundOverEnable)
+                                IsRoundOverEnable = true;
+                            s = "放弃了行使墓地的权利";
+                            break;
+                    }
                     break;
             }
             return s;
@@ -1145,12 +1167,12 @@ namespace Client.ViewModel
                 case 15:
                     Send("3|6|" + RNum + "|" + SNum + "|" + "3|" + s);
                     break;
-                    //回合结束时候丢弃手牌，多选处选择后，将IsStepFinished【16】设置为true，关闭显示
-                    //首先判断剩余的牌是否少于4张，
-                    //如果是，则发送丢弃的牌的ID并将手牌中对应的去掉。并调用回合结束。
-                    //如果不是，则将IsStepFinished【16】设置为false，Step为16，显示多选。
-                    case 16:
-                    if(PocketBuildings.Count-num<5)
+                //回合结束时候丢弃手牌，多选处选择后，将IsStepFinished【16】设置为true，关闭显示
+                //首先判断剩余的牌是否少于4张，
+                //如果是，则发送丢弃的牌的ID并将手牌中对应的去掉。并调用回合结束。
+                //如果不是，则将IsStepFinished【16】设置为false，Step为16，显示多选。
+                case 16:
+                    if (PocketBuildings.Count - num < 5)
                     {
                         Send("3|6|" + RNum + "|" + SNum + "|8|" + s);
                         foreach (var item in a)
@@ -1360,7 +1382,7 @@ namespace Client.ViewModel
                 case 13:
                 case 14:
                 case 15: IsCenterBuildingMultiVisable = false; break;
-                case 16: IsCenterBuildingMultiVisable = false;break;
+                case 16: IsCenterBuildingMultiVisable = false; break;
                 default: Console.WriteLine("中间点击取消时出现了意外的Step!!"); break;
             }
             IsCenterBuildingPocketVisable = false;
@@ -1664,7 +1686,7 @@ namespace Client.ViewModel
             {
                 if ((item.Buildings.Count == 1) && (item.Buildings[0].Id == 63))
                     continue;
-                if ((item.SeatNum != SNum) && (!item.IsBishop)&&(item.Buildings.Count!=0))
+                if ((item.SeatNum != SNum) && (!item.IsBishop) && (item.Buildings.Count != 0))
                 { CenterPlayer.Add(item); }
             }
             if (CenterPlayer.Count == 0)
@@ -1891,23 +1913,18 @@ namespace Client.ViewModel
             }
         }
 
-
         public void Test1()
         {
-            DealReceivePre(TestText);
-            TestText = "";
+            Send(TestText);
+            //TestText = "";
         }
 
         public void Test2()
         {
-            GamePlayerList[SNum - 1].Buildings.Add(CardRes.Buildings[int.Parse(TestText)]);
-            TestText = "";
         }
 
         public void Test3()
         {
-            PocketBuildings.Add(CardRes.Buildings[int.Parse(TestText)]);
-            TestText = "";
         }
         #endregion
 
@@ -1971,9 +1988,9 @@ namespace Client.ViewModel
             Send("3|1|1|" + RNum + "|" + SNum + "|");
 
             #region 测试
-            Test1Text = "模拟接收";
-            Test2Text = "桌面牌加入ID";
-            Test3Text = "手牌加入ID";
+            Test1Text = "发送测试信息";
+            Test2Text = "测试2";
+            Test3Text = "测试3";
             Test1Cmd = new RelayCommand(new Action(Test1));
             Test2Cmd = new RelayCommand(new Action(Test2));
             Test3Cmd = new RelayCommand(new Action(Test3));

@@ -43,13 +43,38 @@ namespace Server.Processes
                     if (playerData.Status.Contains("1|3|1|"))
                     { playerData.Status = "Online"; dataCenter.LobbyPlayerList.Add(playerData); }
                     break;
+                //处理大厅信息
                 case "2":
                     DealLobbyData(dataCenter, socket, strs); break;
                 case "3":
                     //1请求数据。2聊天
                     DealGameData(dataCenter, socket, strs); break;
+                //测试信息
+                case "9":
+                    DealTestData(dataCenter, socket, strs); break;
             }
         }
+
+        //处理测试信息
+        private static void DealTestData(DataCenter dataCenter, Socket socket, string[] strs)
+        {
+            int rNum = int.Parse(strs[1]);
+            int sNum = int.Parse(strs[2]);
+            switch(strs[3])
+            {
+                //加一张手牌
+                case "1":
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[4]) - 1]);
+                    SendToPlayer(dataCenter, rNum, sNum, "3|6|5|" + int.Parse(strs[4]) + "|");
+                    break;
+                //加钱
+                case "2":
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += (int.Parse(strs[4]));
+                    SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|3|3|"+ int.Parse(strs[4])+"|");
+                    break;
+            }
+        }
+
         #region 处理游戏信息(strs[0]="3")
         private static void DealGameData(DataCenter dataCenter, Socket socket, string[] strs)
         {
@@ -91,7 +116,7 @@ namespace Server.Processes
         {
             int rNum = int.Parse(strs[2]);
             int sNum = int.Parse(strs[3]);
-            switch(strs[4])
+            switch (strs[4])
             {
                 //魔术师选择与某个玩家交换手牌
                 case "1":
@@ -105,7 +130,7 @@ namespace Server.Processes
                     bTemp = null;
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|6|" + sNum1 + "|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Count + "|");
                     string s1 = "3|6|4|";
-                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.ForEach(s => s1+=(s.ID+"|"));
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.ForEach(s => s1 += (s.ID + "|"));
                     SendToPlayer(dataCenter, rNum, sNum, s1);
                     s1 = "3|6|4|";
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum1 - 1].PocketB.ForEach(s => s1 += (s.ID + "|"));
@@ -113,7 +138,6 @@ namespace Server.Processes
                     break;
             }
         }
-
 
         #region 处理建筑相关的信息
         //处理建筑相关的信息
@@ -145,7 +169,7 @@ namespace Server.Processes
                     break;
                 //发动铁匠铺
                 case "6":
-                    DealGameBuilding6(dataCenter,rNum,sNum,strs);
+                    DealGameBuilding6(dataCenter, rNum, sNum, strs);
                     break;
                 //发动实验室
                 case "7":
@@ -155,8 +179,30 @@ namespace Server.Processes
                 case "8":
                     DealGameBuilding8(dataCenter, rNum, sNum, strs);
                     break;
+                //墓地相关的内容
+                case "9":
+                    DealGameBuilding9(dataCenter, rNum, sNum, strs);
+                    break;
             }
 
+        }
+
+        //墓地相关的内容。如果是使用墓地，则将刚才牌堆最后一张给他，并减少他的钱，并群发战报，如果放弃则群发战报
+        private static void DealGameBuilding9(DataCenter dataCenter, int rNum, int sNum, string[] strs)
+        {
+            switch (strs[5])
+            {
+                case "1":
+                    int id = dataCenter.RoomDataDic[rNum].BackB[dataCenter.RoomDataDic[rNum].BackB.Count - 1].ID;
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
+                    dataCenter.RoomDataDic[rNum].BackB.RemoveAt(dataCenter.RoomDataDic[rNum].BackB.Count - 1);
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= 1;
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|10|2|" + id + "|");
+                    break;
+                case "2":
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|10|3|");
+                    break;
+            }
         }
 
         //回合结束时候丢弃的手牌，将其从某人手牌中拆掉，然后放到牌堆中。
@@ -166,7 +212,7 @@ namespace Server.Processes
             for (int i = 5; i < strs.Length; i++)
             {
                 id = int.Parse(strs[i]);
-                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s=>s.ID==id);
+                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s => s.ID == id);
                 dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
             }
         }
@@ -175,10 +221,10 @@ namespace Server.Processes
         private static void DealGameBuilding7(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
             int id = int.Parse(strs[5]);
-            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(b=>b.ID==id);
+            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(b => b.ID == id);
             dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[id - 1]);
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money++;
-            SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|9|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|9|");
         }
 
         //发动铁匠铺时候的反应,减钱，然后给三张牌，然后发送给个人，群发战报
@@ -189,11 +235,11 @@ namespace Server.Processes
             for (int i = 0; i < 3; i++)
             {
                 dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
-                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID+"|");
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
             }
             SendToPlayer(dataCenter, rNum, sNum, s);
-            SendToRoom(dataCenter, rNum, "3|2|1|"+sNum+"|5|8|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|8|");
         }
 
         //军阀摧毁某个玩家的某张牌,减掉应该减的钱和牌，将牌加入到牌堆中，并群发战报
@@ -203,14 +249,14 @@ namespace Server.Processes
             int TargetID = int.Parse(strs[6]);
             int money = int.Parse(strs[7]);
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= money;
-            dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.RemoveAll(b=>b.ID==TargetID);
+            dataCenter.RoomDataDic[rNum].PlayerDataList[TargetSnum - 1].TableB.RemoveAll(b => b.ID == TargetID);
             dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[TargetID - 1]);
-            SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|7|"+TargetSnum+"|"+TargetID+"|"+money+"|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|7|" + TargetSnum + "|" + TargetID + "|" + money + "|");
             //检查是否有人持有墓地并且钱的数目大于1并且不是军阀的。
-            int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(playerData => ((playerData.Money >= 1) && (playerData.PocketB.Exists(b => b.ID == 65))&&(playerData.SNum!=sNum)));
-            if(index>=0)
+            int index = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(playerData => ((playerData.Money >= 1) && (playerData.TableB.Exists(b => b.ID == 65)) && (playerData.SNum != sNum)));
+            if (index >= 0)
             {
-                SendToRoom(dataCenter, rNum, "3|1|1|" + dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + "|5|10|1|");
+                SendToRoom(dataCenter, rNum, "3|2|1|" + dataCenter.RoomDataDic[rNum].PlayerDataList[index].SNum + "|5|10|1|");
             }
         }
 
@@ -219,25 +265,25 @@ namespace Server.Processes
         {
             for (int i = 5; i < strs.Length; i++)
             {
-                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[i])-1]);
+                dataCenter.RoomDataDic[rNum].BackB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[i]) - 1]);
                 dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(b => b.ID == int.Parse(strs[i]));
             }
             string s = "3|6|3|";
-            for (int i = 0; i < strs.Length-5; i++)
+            for (int i = 0; i < strs.Length - 5; i++)
             {
                 dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.Add(dataCenter.RoomDataDic[rNum].BackB[0]);
-                s+=(dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
+                s += (dataCenter.RoomDataDic[rNum].BackB[0].ID + "|");
                 dataCenter.RoomDataDic[rNum].BackB.RemoveAt(0);
             }
             NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
-            SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|5|"+(strs.Length-5)+"|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|5|" + (strs.Length - 5) + "|");
         }
 
         //开局拿的建筑牌,将tableB中的对应牌放入pocketB并且将tableB剩余牌放回backB
         private static void DealGameBuilding3(DataCenter dataCenter, int rNum, int sNum, string[] strs)
         {
             int id;
-            switch(strs[5])
+            switch (strs[5])
             {
                 //选择的牌
                 case "1":
@@ -270,8 +316,8 @@ namespace Server.Processes
                     int id1 = int.Parse(strs[6]);
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.CardRes.OrderBuildings[id1 - 1]);
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].PocketB.RemoveAll(s => s.ID == id1);
-                   dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.CardRes.OrderBuildings[id1 - 1].Price;
-                    SendToRoom(dataCenter, rNum, "3|5|3|" +sNum+"|"+ dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money -= dataCenter.CardRes.OrderBuildings[id1 - 1].Price;
+                    SendToRoom(dataCenter, rNum, "3|5|3|" + sNum + "|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|" + dataCenter.RoomDataDic[rNum].FinishCount + "|" + id1 + "|");
                     break;
                 //建设多张牌
@@ -334,7 +380,7 @@ namespace Server.Processes
                 //选择拿钱
                 case "1":
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += 2;
-                    SendToRoom(dataCenter, rNum, "3|5|3|" + sNum + "|"+ dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
+                    SendToRoom(dataCenter, rNum, "3|5|3|" + sNum + "|" + dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money + "|");
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     break;
             }
@@ -397,11 +443,11 @@ namespace Server.Processes
             int sNum = int.Parse(strs[4]);
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsStoling = true;
             int stoledNum = int.Parse(strs[5]);
-            if(dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(stoledNum))
+            if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(stoledNum))
             {
                 dataCenter.RoomDataDic[rNum].PlayerDataList[(dataCenter.RoomDataDic[rNum].Hero2PlayerDic[stoledNum]) - 1].StoledNum = stoledNum;
             }
-            SendToRoom(dataCenter, rNum, "3|2|1|"+sNum+"|1|6|"+stoledNum+"|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|1|6|" + stoledNum + "|");
         }
 
         //处理我要偷取的信息
@@ -414,8 +460,8 @@ namespace Server.Processes
             {
                 //if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p => p.KilledNum == (i+1)) < 0)
                 //    s += ((i+1) + "|");
-                if((i+1)!= dataCenter.RoomDataDic[rNum].KilledNum)
-                    s+= ((i + 1) + "|");
+                if ((i + 1) != dataCenter.RoomDataDic[rNum].KilledNum)
+                    s += ((i + 1) + "|");
             }
             NetCtrl.Send(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Socket, s);
         }
@@ -426,7 +472,7 @@ namespace Server.Processes
             int rNum = int.Parse(strs[3]);
             int sNum = int.Parse(strs[4]);
             int id = int.Parse(strs[5]);
-            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|" + "1|5|"+id+"|");
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|" + "1|5|" + id + "|");
             dataCenter.RoomDataDic[rNum].KilledNum = id;
             if (dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Keys.Contains(id))
             {
@@ -455,7 +501,7 @@ namespace Server.Processes
             int id = int.Parse(strs[5]);
             int index = dataCenter.RoomDataDic[rNum].BackH.FindIndex(hero => hero.ID == id);
             if (id == 5)
-            { dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsBishop = true; }        
+            { dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsBishop = true; }
             dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Roles.Add(dataCenter.RoomDataDic[rNum].BackH[index]);
             dataCenter.RoomDataDic[rNum].Hero2PlayerDic.Add(id, sNum);
             dataCenter.RoomDataDic[rNum].BackH.RemoveAt(index);
@@ -687,8 +733,8 @@ namespace Server.Processes
                 int sNum = dataCenter.RoomDataDic[rNum].Hero2PlayerDic[dataCenter.RoomDataDic[rNum].FinishCount];
 
                 //如果是主教，发送主教的标签
-                if(dataCenter.RoomDataDic[rNum].FinishCount==5)
-                { SendToRoom(dataCenter, rNum, "3|3|5|"+sNum+"|"); }
+                if (dataCenter.RoomDataDic[rNum].FinishCount == 5)
+                { SendToRoom(dataCenter, rNum, "3|3|5|" + sNum + "|"); }
 
                 //如果被偷，后台操作钱之后通知到小偷和被偷者,并更新战报，并将被偷归零
                 if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].StoledNum == dataCenter.RoomDataDic[rNum].FinishCount)
@@ -764,7 +810,7 @@ namespace Server.Processes
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|3|" + moneyBuilding + "|");
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += moneyBuilding;
                 }
-                
+
                 //如果是建筑师，则多发两张手牌并群发战报与单发卡牌信息
                 if (dataCenter.RoomDataDic[rNum].FinishCount == 7)
                 {
