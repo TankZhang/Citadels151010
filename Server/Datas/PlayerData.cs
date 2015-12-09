@@ -256,7 +256,50 @@ namespace Server.Datas
         {
             get
             {
-                return _score;
+                int score = 0;
+                bool[] flags=new bool[6]{ false,false,false,false,false,false};
+                foreach (Building B in TableB)
+                {
+                    score += B.Price;
+                    if (B.ID == 56 || B.ID == 64)
+                        score += 2;
+                    switch(B.Type)
+                    {
+                        case FunctionType.commercial:
+                            flags[0] = true;
+                            break;
+                        case FunctionType.noble:
+                            flags[1] = true;
+                            break;
+                        case FunctionType.religious:
+                            flags[2] = true;
+                            break;
+                        case FunctionType.warlord:
+                            flags[3] = true;
+                            break;
+                        case FunctionType.magic:
+                            if (B.ID == 62)
+                                flags[5] = true;
+                            else
+                                flags[4] = true;
+                            break;
+                    }
+                }
+                int typeFlag = 0;
+                for (int i = 0; i < 6; i++)
+                {
+                    if (!flags[i])
+                        typeFlag++;
+                    if (typeFlag > 1)
+                        break;
+                }
+                if (typeFlag < 2)
+                    score += 3;
+                if (IsFirst)
+                    score += 4;
+                if (IsSecond)
+                    score += 2;
+                return score;
             }
 
             set

@@ -10,28 +10,20 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            string[] ss = { "das", "da" };
-            List<Person> ListP = new List<Person>();
-            ListP.Add(new Person(1));
-            ListP.Add(new Person(2));
-            ListP.Add(new Person(3));
-            ListP.Add(new Person(4));
-            ListP.Add(new Person(3));
-            //Console.WriteLine(ListP.FindIndex(p => p.Id == 3));
-            //Console.WriteLine(ListP.FindAll(p => p.Id == 3));
-            //Console.WriteLine(ss[1]);
-
-            int i = 0;
-            switch(i)
+            int a = 10;
+            switch(a)
             {
-                case 0:Console.WriteLine(i);
-                    i++;
-                    break;
                 case 1:
-                    Console.WriteLine(i);
+                    break;
+                case 10:
+                    for (int i = 0; i < 4; i++)
+                    {
+                        break;
+                    }
+                    Console.WriteLine("dsa");
                     break;
             }
-                Console.ReadKey();
+            Console.ReadKey();
         }
     }
     public class Person

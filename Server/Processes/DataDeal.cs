@@ -395,12 +395,22 @@ namespace Server.Processes
             {
                 //回合结束，群发战报，然后通知下家开始新的回合
                 case "1":
+                    if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum-1].TableB.Count>=8)
+                    {
+                        if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p1 => p1.IsFirst) >=0)
+                        {
+                            if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p2 => p2.IsSecond) < 0)
+                                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsSecond = true;
+                        }
+                        else
+                        {
+                            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsFirst = true;
+                        }
+                    }
                     SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
                     SendRoundStart(dataCenter, rNum);
                     break;
-
             }
-
         }
 
         #region 处理英雄相关的信息
@@ -621,6 +631,17 @@ namespace Server.Processes
         {
             if (dataCenter.RoomDataDic[rNum].FinishCount == 0)
             {
+                //如果有人达到了第一个八个建筑
+                if(dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p=>p.IsFirst)>=0)
+                {
+                    string s = "游戏结束";
+                    foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
+                    {
+                        s += ("\n" + item.Nick);
+                        s += ("\n" + item.Score);
+                    }
+                    SendToRoom(dataCenter, rNum, s);
+                }
                 dataCenter.RoomDataDic[rNum].BackH = CardRes.RandOrderHList(dataCenter.CardRes.OrderHeros);
                 dataCenter.RoomDataDic[rNum].BackH.RemoveAt(0);
             }
