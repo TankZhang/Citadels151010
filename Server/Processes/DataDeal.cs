@@ -72,6 +72,11 @@ namespace Server.Processes
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += (int.Parse(strs[4]));
                     SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|3|3|"+ int.Parse(strs[4])+"|");
                     break;
+                //加一个建筑
+                case "3":
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[4]) - 1]);
+                    SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|2|1|8|"+int.Parse(strs[4])+"|");
+                    break;
             }
         }
 
@@ -632,15 +637,17 @@ namespace Server.Processes
             if (dataCenter.RoomDataDic[rNum].FinishCount == 0)
             {
                 //如果有人达到了第一个八个建筑
-                if(dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p=>p.IsFirst)>=0)
+                int winSeatNum = dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p => p.IsFirst);
+                if (winSeatNum >= 0)
                 {
-                    string s = "游戏结束";
+                    string s = "3|4|3|";
                     foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
                     {
-                        s += ("\n" + item.Nick);
-                        s += ("\n" + item.Score);
+                        s += (item.SNum+"|");
+                        s += (item.Score+"|");
                     }
                     SendToRoom(dataCenter, rNum, s);
+                    return;
                 }
                 dataCenter.RoomDataDic[rNum].BackH = CardRes.RandOrderHList(dataCenter.CardRes.OrderHeros);
                 dataCenter.RoomDataDic[rNum].BackH.RemoveAt(0);

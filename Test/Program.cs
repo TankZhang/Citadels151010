@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,19 +11,31 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            int a = 10;
-            switch(a)
+            List<Person> l = new List<Person>();
+            l.Add(new Person(2));
+            l.Add(new Person(4));
+            l.Add(new Person(3));
+            l.Add(new Person(8));
+            ObservableCollection<Person> o = new ObservableCollection<Person>();
+            l.ForEach(s => o.Add(s));
+            o = new ObservableCollection<Person>(o.OrderBy(s => s.Id));
+            o=new ObservableCollection<Person>(o.Reverse());
+            foreach (var item in o)
             {
-                case 1:
-                    break;
-                case 10:
-                    for (int i = 0; i < 4; i++)
-                    {
-                        break;
-                    }
-                    Console.WriteLine("dsa");
-                    break;
+                Console.WriteLine(item.Id);
             }
+
+            //l.Sort(delegate (Person a, Person b) { return a.Id.CompareTo(b.Id); });
+            //l.Reverse();
+            //l.ForEach(s => Console.WriteLine(s.Id));
+            //IEnumerable<Person> query = null;
+            //query = from item in l orderby item.Id select item;
+            //List<Person> l2 = new List<Person>();
+            //foreach (var item in query)
+            //{
+            //    l2.Add(item);
+            //}
+            //l2.ForEach(s => Console.WriteLine(s.Id));
             Console.ReadKey();
         }
     }

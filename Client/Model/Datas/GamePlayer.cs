@@ -115,7 +115,21 @@ namespace Client.Model.Datas
             }
         }
 
+        int _score;
+        public int Score
+        {
+            get
+            {
+                return _score;
+            }
 
+            set
+            {
+                _score = value;
+                RaisePropertyChanged("Score");
+            }
+        }
+        
         public GamePlayer(int seatNum,string nick,int exp,int money)
         {
             SeatNum = seatNum;
@@ -123,6 +137,7 @@ namespace Client.Model.Datas
             Exp = exp;
             Money = money;
             IsBishop = false;
+            Score = 0;
             Buildings = new ObservableCollection<Building>();
             Roles = new ObservableCollection<Hero>();
         }

@@ -105,6 +105,22 @@ namespace Client.ViewModel
                 RaisePropertyChanged("PocketBuildings");
             }
         }
+
+        //结局时候的玩家列表
+        ObservableCollection<GamePlayer> _overGamePlayers;
+        public ObservableCollection<GamePlayer> OverGamePlayers
+        {
+            get
+            {
+                return _overGamePlayers;
+            }
+
+            set
+            {
+                _overGamePlayers = value;
+                RaisePropertyChanged("OverGamePlayers");
+            }
+        }
         #endregion
 
         #region 控制中间控件显示的bool
@@ -249,6 +265,38 @@ namespace Client.ViewModel
             {
                 _isRoundOverEnable = value;
                 RaisePropertyChanged("IsRoundOverEnable");
+            }
+        }
+
+        //中间游戏结束时候的显示
+        bool _isGameOverVisible;
+        public bool IsGameOverVisible
+        {
+            get
+            {
+                return _isGameOverVisible;
+            }
+
+            set
+            {
+                _isGameOverVisible = value;
+                RaisePropertyChanged("IsGameOverVisible");
+            }
+        }
+
+        //是否赢得游戏
+        bool _isWin;
+        public bool IsWin
+        {
+            get
+            {
+                return _isWin;
+            }
+
+            set
+            {
+                _isWin = value;
+                RaisePropertyChanged("IsWin");
             }
         }
         #endregion
@@ -632,7 +680,25 @@ namespace Client.ViewModel
                 case "2":
                     DealRound2(strs);
                     break;
+                //游戏结束
+                case "3":
+                    DealRound3(strs);
+                    break;
             }
+        }
+
+        //处理游戏结束的信息
+        private void DealRound3(string[] strs)
+        {
+            for (int i = 0; i < (strs.Length-3)/2; i++)
+            {
+                GamePlayerList[int.Parse(strs[2 * i + 3]) - 1].Score = int.Parse(strs[2 * i + 4]);
+            }
+            OverGamePlayers = new ObservableCollection<GamePlayer>(GamePlayerList.OrderBy(g => g.Score));
+            OverGamePlayers = new ObservableCollection<GamePlayer>(OverGamePlayers.Reverse());
+            if (SNum == OverGamePlayers[0].SeatNum)
+                IsWin = true;
+            IsGameOverVisible = true;
         }
 
         //处理一轮结束的信息
@@ -1481,6 +1547,25 @@ namespace Client.ViewModel
             Send("3|6|" + RNum + "|" + SNum + "|9|2|");
             IsCenterCemeteryVisible = false;
         }
+
+        //游戏结束确认的命令
+        ICommand _overEnterCmd;
+        public ICommand OverEnterCmd
+        {
+            get
+            {
+                return _overEnterCmd;
+            }
+
+            set
+            {
+                _overEnterCmd = value;
+                RaisePropertyChanged("OverEnterCmd");
+            }
+        }
+        //游戏结束确认的操作
+        public void OverEnter()
+        { }
         #endregion
 
         #region 控制台按下的Cmd
@@ -1913,6 +1998,7 @@ namespace Client.ViewModel
             }
         }
 
+
         public void Test1()
         {
             Send(TestText);
@@ -1951,6 +2037,7 @@ namespace Client.ViewModel
             RoundOverCmd = new RelayCommand(new Action(RoundOver));
             UseCemeteryCmd = new RelayCommand(new Action(UseCemetery));
             GiveUpCemeteryCmd = new RelayCommand(new Action(GiveUpCemetery));
+            OverEnterCmd = new RelayCommand(new Action(OverEnter));
             del = new Del(DealReceivePre);
             ThReceive = new Thread(ReceiveSocket);
             ThReceive.IsBackground = true;
@@ -1961,6 +2048,7 @@ namespace Client.ViewModel
             CenterPlayer = new ObservableCollection<GamePlayer>();
             PocketBuildings = new ObservableCollection<Building>();
             GamePlayerList = new ObservableCollection<GamePlayer>();
+            OverGamePlayers = new ObservableCollection<GamePlayer>();
             for (int i = 0; i < num; i++)
             {
                 GamePlayer p = new GamePlayer(i + 1, "", 0, 0);
@@ -1976,6 +2064,8 @@ namespace Client.ViewModel
             IsRoundOver = true;
             IsRoundOverEnable = true;
             IsWall = false;
+            IsGameOverVisible = false;
+            IsWin = false;
             ChatText = "";
             ChatLog = "";
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";

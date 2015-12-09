@@ -88,6 +88,9 @@
     <Compile Include="View\CenterBuildingUC.xaml.cs">
       <DependentUpon>CenterBuildingUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CenterGameOverUC.xaml.cs">
+      <DependentUpon>CenterGameOverUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CenterHeroUC.xaml.cs">
       <DependentUpon>CenterHeroUC.xaml</DependentUpon>
     </Compile>
@@ -171,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CenterBuildingUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CenterGameOverUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
