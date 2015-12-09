@@ -111,6 +111,12 @@
                     Visibility="{Binding IsCenterCemeteryVisible, Converter={StaticResource visibilityConverter}}"
                     TabIndex="-1">
                 </local:CenterUseCemeteryUC>
+                <!--中间游戏结束选择-->
+                <local:CenterGameOverUC
+                    Panel.ZIndex="-1"
+                    Visibility="{Binding IsGameOverVisible,Converter={StaticResource visibilityConverter}}"
+                    TabIndex="-1"
+                    />
             </Grid>
             <!--控制台-->
             <local:ControlBoardUC Grid.Column="2" 

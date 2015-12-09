@@ -1565,7 +1565,9 @@ namespace Client.ViewModel
         }
         //游戏结束确认的操作
         public void OverEnter()
-        { }
+        {
+            ChatLog += "\n结束游戏！";
+        }
         #endregion
 
         #region 控制台按下的Cmd
