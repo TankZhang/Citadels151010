@@ -19,7 +19,7 @@ namespace Client.ViewModel
     {
         Thread ThReceive;
         public int SNum { get; set; }
-        public int RNum { get; set; }
+        public int RNum { get; set; } 
         //被摧毁的座位号
         public int DestroyedSNum { get; set; }
         //被摧毁的玩家有没有城墙
