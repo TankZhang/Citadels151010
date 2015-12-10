@@ -234,7 +234,7 @@ namespace Client.ViewModel
                 _isRoundOver = value;
                 RaisePropertyChanged("IsRoundOver");
             }
-        }
+        } 
 
         //中间控制墓地功能的显示
         bool _isCenterCemeteryVisible;
