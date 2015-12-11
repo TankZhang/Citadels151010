@@ -51,6 +51,21 @@ namespace Server.SQL
                 return false;
             }
         }
+        //更新经验值
+        public bool UpdateExp(string mail, int exp)
+        {
+            SqlCmd.CommandText = String.Format("update GameUser set GameUser_Exp={0} where GameUser_Mail='{1}'", exp, mail);
+            SqlCmd.Connection = SqlConnection;
+            if (SqlCmd.ExecuteNonQuery() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
         //查看Mail是否存在
         public bool IsMailExistInDb(string mail)
         {

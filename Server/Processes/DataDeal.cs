@@ -115,6 +115,7 @@ namespace Server.Processes
                     break;
             }
         }
+        
 
         //处理玩家相关的信息
         private static void DealGamePLayer(DataCenter dataCenter, string[] strs)
@@ -391,6 +392,7 @@ namespace Server.Processes
             }
         }
 
+        #region 处理回合相关的信息
         //处理回合相关的信息
         private static void DealGameRound(DataCenter dataCenter, string[] strs)
         {
@@ -398,26 +400,51 @@ namespace Server.Processes
             int sNum = int.Parse(strs[3]);
             switch (strs[4])
             {
-                //回合结束，群发战报，然后通知下家开始新的回合
+                //回合结束
                 case "1":
-                    if(dataCenter.RoomDataDic[rNum].PlayerDataList[sNum-1].TableB.Count>=8)
-                    {
-                        if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p1 => p1.IsFirst) >=0)
-                        {
-                            if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p2 => p2.IsSecond) < 0)
-                                dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsSecond = true;
-                        }
-                        else
-                        {
-                            dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsFirst = true;
-                        }
-                    }
-                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
-                    SendRoundStart(dataCenter, rNum);
+                    DealGameRound1(dataCenter, rNum, sNum);
+                    break;
+                //游戏结束
+                case "2":
+                    DealGameRound2(dataCenter, rNum, sNum, int.Parse(strs[5]));
                     break;
             }
         }
 
+        //游戏结束,首先更新他的exp，然后将他的Status置为Break，模拟重连，然后将其从房间中踢掉。
+        private static void DealGameRound2(DataCenter dataCenter, int rNum, int sNum, int exp)
+        {
+            string mail = dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Mail;
+            App.vM.SQLCtrl.UpdateExp(mail, exp);
+            dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Status = "Break";
+            DealData(dataCenter, dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Socket,
+                "1|3|"+mail+"|"+ dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Pwd+"|");
+            dataCenter.RoomDataDic[rNum].PlayerDataList.RemoveAll(p => p.SNum == sNum);
+            if(dataCenter.RoomDataDic[rNum].PlayerDataList.Count==0)
+            { dataCenter.RoomDataDic.Remove(rNum); }
+        }
+
+        //回合结束，群发战报，然后通知下家开始新的回合
+        private static void DealGameRound1(DataCenter dataCenter, int rNum, int sNum)
+        {
+            if (dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Count >= 8)
+            {
+                if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p1 => p1.IsFirst) >= 0)
+                {
+                    if (dataCenter.RoomDataDic[rNum].PlayerDataList.FindIndex(p2 => p2.IsSecond) < 0)
+                        dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsSecond = true;
+                }
+                else
+                {
+                    dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].IsFirst = true;
+                }
+            }
+            SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|2|2|" + dataCenter.RoomDataDic[rNum].FinishCount + "|");
+            SendRoundStart(dataCenter, rNum);
+        }
+
+
+        #endregion
         #region 处理英雄相关的信息
         //处理英雄相关的信息
         private static void DealGameHero(DataCenter dataCenter, string[] strs)

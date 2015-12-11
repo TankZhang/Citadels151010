@@ -18,10 +18,12 @@ namespace Server.Processes
             //1连接请求。2注册信息。3登录信息
             switch (strs[1])
             {
+                //连接
                 case "1":
                     playerData.Status = "1|1|1|";
                     return playerData;
                 //邮箱|昵称|密码|真实姓名|
+                //注册
                 case "2":
                     if (sqlCtrl.IsMailExistInDb(strs[2]))
                     { playerData.Status = "1|2|-1|邮箱已注册|"; return playerData; }
@@ -30,6 +32,7 @@ namespace Server.Processes
                     Register(sqlCtrl, socket, strs, out playerData);
                     return playerData;
                 //邮箱|密码|
+                //登陆
                 case "3":
                     if (!sqlCtrl.IsMailExistInDb(strs[2]))
                     { playerData.Status = "1|3|-1|邮箱未注册|"; return playerData; }

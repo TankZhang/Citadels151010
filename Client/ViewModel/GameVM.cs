@@ -1567,6 +1567,9 @@ namespace Client.ViewModel
         public void OverEnter()
         {
             ChatLog += "\n结束游戏！";
+            if (IsWin)
+                GamePlayerList[SNum - 1].Exp++;
+            Send("3|4|" + RNum + "|" + SNum + "|2|"+ GamePlayerList[SNum - 1].Exp + "|");
         }
         #endregion
 
