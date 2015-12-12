@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:Client.View"
         mc:Ignorable="d"
         Title="富饶之城" Height="720" Width="1280"
-        WindowStyle="SingleBorderWindow">
+        WindowStyle="SingleBorderWindow"
+        IsEnabled="{Binding IsEnable}"
+        IsEnabledChanged="Window_IsEnabledChanged"
+        Closing="Window_Closing">
     <Window.Background>
         <ImageBrush ImageSource="/Res/Pic/GameVBG.jpg"/>
     </Window.Background>

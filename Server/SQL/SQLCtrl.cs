@@ -95,7 +95,6 @@ namespace Server.SQL
         //在citadelsdb的GameUser表中依靠邮箱查询
         public PlayerData SelectInDb(string mail)
         {
-
             PlayerData playerData = new PlayerData();
             SqlCmd.CommandText = String.Format("select* from GameUser where GameUser_Mail='{0}'", mail);
             SqlCmd.Connection = SqlConnection;

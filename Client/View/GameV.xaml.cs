@@ -74,5 +74,22 @@ namespace Client.View
             }
         }
         #endregion
+
+        private void Window_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == false)
+            {
+                Close();
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!IsEnabled)
+            {
+                LobbyV lobbyV = new LobbyV();
+                lobbyV.Show();
+            }
+        }
     }
 }

@@ -25,6 +25,22 @@ namespace Client.ViewModel
         //被摧毁的玩家有没有城墙
         public bool IsWall { get; set; }
         public CardRes CardRes { get; set; }
+        //控制窗口显示与否
+        private bool isEnable;
+        public bool IsEnable
+        {
+            get
+            {
+                return isEnable;
+            }
+
+            set
+            {
+                isEnable = value;
+                RaisePropertyChanged("IsEnable");
+            }
+        }
+
         #region 各种列表ObservableCollection
         //玩家列表
         ObservableCollection<GamePlayer> _gamePlayerList;
@@ -485,6 +501,18 @@ namespace Client.ViewModel
                     }
                     string str = Encoding.UTF8.GetString(buffer, 0, r);
                     Console.WriteLine("game收到了：" + str);
+                    string[] ss = str.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var item in ss)
+                    {
+                        //进入Lobby的数据
+                        if (item.StartsWith("1|3|1|"))
+                        {
+                            string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                            App.UserInfo = new UserInfo(strs[3], strs[4], strs[5], strs[6], int.Parse(strs[7]));
+                            IsEnable = false;
+                            return;
+                        }
+                    }
                     Application.Current.Dispatcher.Invoke(del, str);
                 }//try结束
                 catch (Exception ex)
@@ -513,6 +541,7 @@ namespace Client.ViewModel
 
             string[] strs = item.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (strs[0] != "3") { return; }
+            //游戏中的数据
             switch (strs[1])
             {
                 //回复数据
@@ -2056,8 +2085,10 @@ namespace Client.ViewModel
             OverGamePlayers = new ObservableCollection<GamePlayer>();
             for (int i = 0; i < num; i++)
             {
-                GamePlayer p = new GamePlayer(i + 1, "", 0, 0);
-                GamePlayerList.Add(p);
+                if(i==(SNum-1))
+                    GamePlayerList.Add(new GamePlayer(SNum,App.UserInfo.Nick,App.UserInfo.Exp,0));
+                else
+                    GamePlayerList.Add(new GamePlayer(i + 1, "", 0, 0));
             }
             IsCenterBuildingMultiVisable = false;
             IsCenterBuildingVisable = false;
@@ -2071,6 +2102,7 @@ namespace Client.ViewModel
             IsWall = false;
             IsGameOverVisible = false;
             IsWin = false;
+            IsEnable = true;
             ChatText = "";
             ChatLog = "";
             BattleLog = "\n\n\n\n\n\n\n\n这里是战报实时显示：\n";

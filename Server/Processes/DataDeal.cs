@@ -60,7 +60,7 @@ namespace Server.Processes
         {
             int rNum = int.Parse(strs[1]);
             int sNum = int.Parse(strs[2]);
-            switch(strs[3])
+            switch (strs[3])
             {
                 //加一张手牌
                 case "1":
@@ -70,12 +70,12 @@ namespace Server.Processes
                 //加钱
                 case "2":
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].Money += (int.Parse(strs[4]));
-                    SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|3|3|"+ int.Parse(strs[4])+"|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|3|3|" + int.Parse(strs[4]) + "|");
                     break;
                 //加一个建筑
                 case "3":
                     dataCenter.RoomDataDic[rNum].PlayerDataList[sNum - 1].TableB.Add(dataCenter.CardRes.OrderBuildings[int.Parse(strs[4]) - 1]);
-                    SendToRoom(dataCenter,rNum,"3|2|1|"+sNum+"|5|2|1|8|"+int.Parse(strs[4])+"|");
+                    SendToRoom(dataCenter, rNum, "3|2|1|" + sNum + "|5|2|1|8|" + int.Parse(strs[4]) + "|");
                     break;
             }
         }
@@ -115,7 +115,7 @@ namespace Server.Processes
                     break;
             }
         }
-        
+
 
         //处理玩家相关的信息
         private static void DealGamePLayer(DataCenter dataCenter, string[] strs)
@@ -418,10 +418,13 @@ namespace Server.Processes
             App.vM.SQLCtrl.UpdateExp(mail, exp);
             dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Status = "Break";
             DealData(dataCenter, dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Socket,
-                "1|3|"+mail+"|"+ dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Pwd+"|");
+                "1|3|" + mail + "|" + dataCenter.RoomDataDic[rNum].PlayerDataList.Find(p => p.SNum == sNum).Pwd + "|");
             dataCenter.RoomDataDic[rNum].PlayerDataList.RemoveAll(p => p.SNum == sNum);
-            if(dataCenter.RoomDataDic[rNum].PlayerDataList.Count==0)
-            { dataCenter.RoomDataDic.Remove(rNum); }
+            if (dataCenter.RoomDataDic[rNum].PlayerDataList.Count == 0)
+            {
+                dataCenter.RoomDataDic.Remove(rNum);
+                SendRoughLobbyData(dataCenter);
+            }
         }
 
         //回合结束，群发战报，然后通知下家开始新的回合
@@ -670,8 +673,8 @@ namespace Server.Processes
                     string s = "3|4|3|";
                     foreach (var item in dataCenter.RoomDataDic[rNum].PlayerDataList)
                     {
-                        s += (item.SNum+"|");
-                        s += (item.Score+"|");
+                        s += (item.SNum + "|");
+                        s += (item.Score + "|");
                     }
                     SendToRoom(dataCenter, rNum, s);
                     return;
