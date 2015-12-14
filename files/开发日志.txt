@@ -292,6 +292,10 @@ CenterBuildingPocketUC.xaml
 	结束掉当前的线程，
 	然后打开大厅界面，
 	循环往复。
+#15.12.14
+客户端：
+	加入最后分数统计listview，
+	数据库连接加入关闭。
 
 	
 	

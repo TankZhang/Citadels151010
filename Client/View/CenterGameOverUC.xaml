@@ -29,11 +29,23 @@
                    Grid.Column="1"
                    Source="{Binding IsWin,Converter={StaticResource IsWinConverter}}"
                    />
-            <TextBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Text="{Binding IsWin}"
-                />
+            <ListView Grid.Row="1"
+                      Grid.Column="1"
+                      Name="lvRoom"
+                      ItemsSource="{Binding OverGamePlayers,Mode=OneWay}"
+                      Background="Transparent"
+                      FontSize="25"
+                      
+                      >
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="昵称" DisplayMemberBinding="{Binding Nick}" Width="100" />
+                        <GridViewColumn Header="座号" DisplayMemberBinding="{Binding SeatNum}" Width="100" />
+                        <GridViewColumn Header="经验" DisplayMemberBinding="{Binding Exp}" Width="100" />
+                        <GridViewColumn Header="分数" DisplayMemberBinding="{Binding Score}" Width="100" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
             <Button Grid.Row="2"
                     Grid.Column="1"
                     Content="确定"

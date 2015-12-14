@@ -675,6 +675,7 @@ namespace Server.Processes
                     {
                         s += (item.SNum + "|");
                         s += (item.Score + "|");
+                        s += (item.Exp+"|");
                     }
                     SendToRoom(dataCenter, rNum, s);
                     return;

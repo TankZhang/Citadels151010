@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server"
         mc:Ignorable="d"
-        Title="Server" Height="350" Width="525">
+        Title="Server" Height="350" Width="525"
+        Closing="Window_Closing">
     <Grid>
         <Grid Name="gridStart">
             <TextBlock Text="选择服务器IP地址：" x:Name="textBlock" HorizontalAlignment="Left" Margin="96,73,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>

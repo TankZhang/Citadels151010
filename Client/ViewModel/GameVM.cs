@@ -19,7 +19,7 @@ namespace Client.ViewModel
     {
         Thread ThReceive;
         public int SNum { get; set; }
-        public int RNum { get; set; } 
+        public int RNum { get; set; }
         //被摧毁的座位号
         public int DestroyedSNum { get; set; }
         //被摧毁的玩家有没有城墙
@@ -249,8 +249,8 @@ namespace Client.ViewModel
             {
                 _isRoundOver = value;
                 RaisePropertyChanged("IsRoundOver");
-            } 
-        } 
+            }
+        }
 
         //中间控制墓地功能的显示
         bool _isCenterCemeteryVisible;
@@ -719,14 +719,18 @@ namespace Client.ViewModel
         //处理游戏结束的信息
         private void DealRound3(string[] strs)
         {
-            for (int i = 0; i < (strs.Length-3)/2; i++)
+            for (int i = 0; i < (strs.Length - 3) / 3; i++)
             {
-                GamePlayerList[int.Parse(strs[2 * i + 3]) - 1].Score = int.Parse(strs[2 * i + 4]);
+                GamePlayerList[int.Parse(strs[3 * i + 3]) - 1].Score = int.Parse(strs[3 * i + 4]);
+                GamePlayerList[int.Parse(strs[3 * i + 3]) - 1].Exp = int.Parse(strs[3 * i + 5]);
             }
             OverGamePlayers = new ObservableCollection<GamePlayer>(GamePlayerList.OrderBy(g => g.Score));
             OverGamePlayers = new ObservableCollection<GamePlayer>(OverGamePlayers.Reverse());
+            OverGamePlayers[0].Exp++;
             if (SNum == OverGamePlayers[0].SeatNum)
+            {
                 IsWin = true;
+            }
             IsGameOverVisible = true;
         }
 
@@ -1596,9 +1600,7 @@ namespace Client.ViewModel
         public void OverEnter()
         {
             ChatLog += "\n结束游戏！";
-            if (IsWin)
-                GamePlayerList[SNum - 1].Exp++;
-            Send("3|4|" + RNum + "|" + SNum + "|2|"+ GamePlayerList[SNum - 1].Exp + "|");
+            Send("3|4|" + RNum + "|" + SNum + "|2|" + GamePlayerList[SNum - 1].Exp + "|");
         }
         #endregion
 
@@ -2085,8 +2087,8 @@ namespace Client.ViewModel
             OverGamePlayers = new ObservableCollection<GamePlayer>();
             for (int i = 0; i < num; i++)
             {
-                if(i==(SNum-1))
-                    GamePlayerList.Add(new GamePlayer(SNum,App.UserInfo.Nick,App.UserInfo.Exp,0));
+                if (i == (SNum - 1))
+                    GamePlayerList.Add(new GamePlayer(SNum, App.UserInfo.Nick, App.UserInfo.Exp, 0));
                 else
                     GamePlayerList.Add(new GamePlayer(i + 1, "", 0, 0));
             }

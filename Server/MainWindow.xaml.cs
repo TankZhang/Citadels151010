@@ -39,5 +39,10 @@ namespace Server
         {
 
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            App.vM.SQLCtrl.SqlConnection.Close();
+        }
     }
 }
