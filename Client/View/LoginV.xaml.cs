@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace Client.View
 {
     /// <summary>
-    /// LoginV.xaml 的交互逻辑
+    /// LoginV.xaml 的交互逻辑,
     /// </summary>
     public partial class LoginV : Window
     {
